@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="def_device_name">设备名称</string>
+    <string name="def_status_msg">状态消息</string>
+    <string name="def_update_time">更新时间</string>
+    <string name="action_settings">设置</string>
+</resources>
