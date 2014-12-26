@@ -2,13 +2,29 @@ package com.hamster.incontrol;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+
+import java.io.IOException;
 
 public class MainActivity extends Activity {
 
     private DeviceListViewImpl List_adapter;
+    private Handler handler = new Handler() {
+
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +34,23 @@ public class MainActivity extends Activity {
         List_adapter = new DeviceListViewImpl(getApplicationContext());
         ListView lv = (ListView) findViewById(R.id.device_list);
         lv.setAdapter(List_adapter);
-        List_adapter.addItem();
+
+
+        new Thread() {
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                super.run();
+                NetworkAccessor na = new NetworkAccessor(1);
+                try {
+                    Sensor[] sensors = Sensor.getSensorList(na, null);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     @Override
