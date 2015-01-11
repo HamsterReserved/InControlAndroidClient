@@ -5,6 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="def_status_msg">Status Message</string>
     <string name="def_update_time">Update Time</string>
+    <string name="def_sensor_name">Sensor Name</string>
     <string name="def_device_name">Device Name</string>
 
 </resources>
