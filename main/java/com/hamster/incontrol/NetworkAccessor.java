@@ -1,20 +1,19 @@
 package com.hamster.incontrol;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Hamster on 2014/12/14.
@@ -22,7 +21,10 @@ import org.json.JSONObject;
  * 用来从云端读取主机数据的类
  */
 public class NetworkAccessor {
-    private final int DEVICE_TYPE = 2; // 设备类型是客户端，不可修改
+    /**
+     * API地址
+     */
+    public static final String INCONTROL_API_URL = "http://incontrol.sinaapp.com/incontrol_api.php";
 
     /**
      * 查询所有传感器
@@ -33,22 +35,12 @@ public class NetworkAccessor {
      */
     public int REQUEST_TYPE_QUERY_SENSOR_INFO = 2;
 
-    /**
-     * 主机序列号（用int真的好么？）
-     */
-    private int mDeviceId = 0;
-    /**
-     * 用户设定的密码，有可能不需要
-     */
-    private String mCredentials = null;
+    private final int DEVICE_TYPE = 2; // 设备类型是客户端，不可修改
+    private HomeDevice device;
 
-    NetworkAccessor(int device_id) {
+    NetworkAccessor(HomeDevice mydevice) {
         super();
-        mDeviceId = device_id;
-    }
-
-    public void setCredentials(String credentials) {
-        mCredentials = credentials;
+        this.device = mydevice;
     }
 
     /**
@@ -59,7 +51,7 @@ public class NetworkAccessor {
      */
     public JSONObject updateSensorInfoJSON(int sensor_id) throws IOException, JSONException {
         Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put("device_id", String.valueOf(mDeviceId));
+        paramMap.put("device_id", String.valueOf(device.getDeviceId()));
         paramMap.put("device_type", String.valueOf(DEVICE_TYPE));
         paramMap.put("request_type", String.valueOf(REQUEST_TYPE_QUERY_SENSOR_INFO));
         paramMap.put("sensor_id", String.valueOf(sensor_id));
@@ -90,7 +82,7 @@ public class NetworkAccessor {
      */
     public JSONArray updateSensorListJSON() throws IOException, JSONException {
         Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put("device_id", String.valueOf(mDeviceId));
+        paramMap.put("device_id", String.valueOf(device.getDeviceId()));
         paramMap.put("device_type", String.valueOf(DEVICE_TYPE));
         paramMap.put("request_type", String.valueOf(REQUEST_TYPE_QUERY_SENSORS));
 
@@ -113,7 +105,7 @@ public class NetworkAccessor {
     }
 
     private String buildUrlWithParams(Map map) {
-        StringBuilder sb = new StringBuilder(ConfigurationCenter.INCONTROL_API_URL);
+        StringBuilder sb = new StringBuilder(INCONTROL_API_URL);
         Set entryset = map.entrySet();
         Iterator iter = entryset.iterator();
         boolean isFirstParam = true;

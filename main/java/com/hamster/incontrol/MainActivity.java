@@ -7,7 +7,6 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -34,15 +33,18 @@ public class MainActivity extends Activity {
         List_adapter = new DeviceListViewImpl(getApplicationContext());
         ListView lv = (ListView) findViewById(R.id.device_list);
         lv.setAdapter(List_adapter);
+        final HomeDevice hd = new HomeDevice(1, null);
 
         new Thread() {
             @Override
             public void run() {
                 // TODO Auto-generated method stub
                 super.run();
-                NetworkAccessor na = new NetworkAccessor(1);
+                NetworkAccessor na = new NetworkAccessor(hd);
                 try {
                     Sensor[] sensors = Sensor.getSensorList(na, null);
+                    List_adapter.addToSensors(sensors);
+                    List_adapter.notifyDataSetChanged();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -66,7 +68,7 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            List_adapter.addItem();
+            //List_adapter.addItem();
             List_adapter.notifyDataSetChanged();
             return true;
         }

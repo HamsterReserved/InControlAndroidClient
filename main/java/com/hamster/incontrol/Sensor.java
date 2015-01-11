@@ -156,9 +156,9 @@ public class Sensor {
     }
 
     /**
-     * 查询指定传感器信息
+     * 查询指定传感器信息D
      *
-     * @param na 已初始化有device_id的NetworkAccessor实例
+     * @param na 已初始化有Homeevice的NetworkAccessor实例
      * @throws IOException   网络错误
      * @throws JSONException JSON格式错误
      */
