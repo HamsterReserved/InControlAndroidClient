@@ -10,19 +10,38 @@ import java.io.IOException;
  * 储存一个传感器的信息，并可以查询其值（还能干嘛……）
  */
 public class Sensor {
+
+    /******************常量和内部枚举********************/
+
     /**
-     * 默认的无效传感器ID，表明此实例还没有初始化
+     * 传感器类型，从0起始，后续有待添加。
+     * 请保持与云端PHP、单片机程序中的int值一致！
      */
-    public static final int INVALID_SENSOR_ID = -1;
-    /**
-     * 传感器ID，必须，只能通过构造函数传入，但可以读出
-     */
-    private int mSensorId = INVALID_SENSOR_ID;
+    public enum SensorType {
+        SENSOR_LIGHT,
+        SENSOR_ELECTRICITY,
+        SENSOR_MOTION,
+        SENSOR_SWITCH,
+        SENSOR_IR,
+        SENSOR_UNKNOWN
+    }
 
     private static final String JSON_SENSOR_ID_KEY = "sensor_id";
     private static final String JSON_SENSOR_NAME_KEY = "sensor_name";
     private static final String JSON_SENSOR_TYPE_KEY = "sensor_type";
     private static final String JSON_SENSOR_VALUE_KEY = "sensor_info";
+
+    /**
+     * 默认的无效传感器ID，表明此实例还没有初始化
+     */
+    public static final int INVALID_SENSOR_ID = -1;
+
+    /**************************类成员*************************/
+
+    /**
+     * 传感器ID，必须，只能通过构造函数传入，但可以读出
+     */
+    private int mSensorId = INVALID_SENSOR_ID;
     /**
      * 传感器名称，可以储存在控制中心里，也可以暂时保存在手机上
      *
@@ -40,15 +59,10 @@ public class Sensor {
     }
 
     public static SensorType convertIntToType(int conv) {
-        switch (conv) {
-            case 1:
-                return SensorType.SENSOR_LIGHT;
-            case 2:
-                return SensorType.SENSOR_ELECTRICITY;
-            case 3:
-                return SensorType.SENSOR_SWITCH;
-            default:
-                return SensorType.SENSOR_UNKNOWN;
+        try {
+            return SensorType.values()[conv];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return SensorType.SENSOR_UNKNOWN;
         }
     }
 
@@ -159,18 +173,5 @@ public class Sensor {
         } else {
             throw new IllegalArgumentException("Sensor ID not defined!");
         }
-    }
-
-    /**
-     * 传感器类型，从0起始，后续有待添加。
-     * 请保持与云端PHP、单片机程序中的int值一致！
-     */
-    public enum SensorType {
-        SENSOR_LIGHT,
-        SENSOR_ELECTRICITY,
-        SENSOR_MOTION,
-        SENSOR_SWITCH,
-        SENSOR_IR,
-        SENSOR_UNKNOWN
     }
 }
