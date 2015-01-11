@@ -15,15 +15,7 @@ import java.io.IOException;
 public class MainActivity extends Activity {
 
     private DeviceListViewImpl List_adapter;
-    private Handler handler = new Handler() {
-
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 0:
-                    break;
-            }
-        }
-    };
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +26,7 @@ public class MainActivity extends Activity {
         ListView lv = (ListView) findViewById(R.id.device_list);
         lv.setAdapter(List_adapter);
         final HomeDevice hd = new HomeDevice(1, null);
+        Sensor tmp_sensors[];
 
         new Thread() {
             @Override
@@ -42,10 +35,20 @@ public class MainActivity extends Activity {
                 super.run();
                 NetworkAccessor na = new NetworkAccessor(hd);
                 try {
-                    Sensor[] sensors = Sensor.getSensorList(na, null);
-                    List_adapter.addToSensors(sensors);
-                    List_adapter.notifyDataSetChanged();
+                    final Sensor sensors[] = Sensor.getSensorList(na, null);
+                    for (int i = 0; i < sensors.length; ++i) {
+                        sensors[i].update(na);
+                    }
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            List_adapter.addToSensors(sensors);
+                            List_adapter.notifyDataSetChanged();
+                        }
+                    });
+
                 } catch (IOException e) {
+                    // TODO 这真的很重要！
                     e.printStackTrace();
                 } catch (JSONException e) {
                     e.printStackTrace();

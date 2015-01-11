@@ -66,9 +66,11 @@ public class NetworkAccessor {
             JSONObject json = new JSONObject(retStr);
             return json;
         } else if (httpResponse.getStatusLine().getStatusCode() == 501) { // "Not implemented"
+            // TODO 程序会卡!
             throw new IOException("URL Parameters Error! Detail: "
                     + EntityUtils.toString(httpResponse.getEntity()));
         } else {
+            // TODO 程序会卡！
             throw new IOException("HTTP Return Code unknown: "
                     + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
         }

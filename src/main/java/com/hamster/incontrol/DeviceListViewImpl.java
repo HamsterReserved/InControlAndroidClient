@@ -8,7 +8,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class DeviceListViewImpl extends BaseAdapter {
 
@@ -17,13 +21,13 @@ public class DeviceListViewImpl extends BaseAdapter {
      */
     private Context mContext = null;
     private LayoutInflater mInflater = null;
-    private List<Sensor> mSensors;
+    private ArrayList<Sensor> mSensors;
 
     DeviceListViewImpl(Context context) {
         if (context != null)
             mContext = context;
         mInflater = LayoutInflater.from(mContext);
-
+        mSensors = new ArrayList<Sensor>();
     }
 
     public void addToSensors(Sensor new_sensors[]) {

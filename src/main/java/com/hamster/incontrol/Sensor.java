@@ -158,13 +158,14 @@ public class Sensor {
     /**
      * 查询指定传感器信息D
      *
-     * @param na 已初始化有Homeevice的NetworkAccessor实例
+     * @param na 已初始化有HomeDevice的NetworkAccessor实例
      * @throws IOException   网络错误
      * @throws JSONException JSON格式错误
      */
     public void update(NetworkAccessor na) throws IOException, JSONException {
         if (this.isInfoComplete()) {
             JSONObject json;
+
             json = na.updateSensorInfoJSON(mSensorId);
             this.setSensorName(json.getString(JSON_SENSOR_NAME_KEY), false);
             this.setSensorType(convertIntToType(json.getInt(JSON_SENSOR_TYPE_KEY)));
