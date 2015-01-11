@@ -168,7 +168,9 @@ public class Sensor {
     public enum SensorType {
         SENSOR_LIGHT,
         SENSOR_ELECTRICITY,
+        SENSOR_MOTION,
         SENSOR_SWITCH,
+        SENSOR_IR,
         SENSOR_UNKNOWN
     }
 }

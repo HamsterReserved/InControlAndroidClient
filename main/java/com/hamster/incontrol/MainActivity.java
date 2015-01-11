@@ -35,7 +35,6 @@ public class MainActivity extends Activity {
         ListView lv = (ListView) findViewById(R.id.device_list);
         lv.setAdapter(List_adapter);
 
-
         new Thread() {
             @Override
             public void run() {
