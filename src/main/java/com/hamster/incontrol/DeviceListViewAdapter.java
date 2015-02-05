@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class DeviceListViewImpl extends BaseAdapter {
+public class DeviceListViewAdapter extends BaseAdapter {
 
     /**
      * Items in List
@@ -19,7 +19,7 @@ public class DeviceListViewImpl extends BaseAdapter {
     private LayoutInflater mInflater = null;
     private ArrayList<Sensor> mSensors;
 
-    DeviceListViewImpl(Context context) {
+    DeviceListViewAdapter(Context context) {
         if (context != null)
             mContext = context;
         mInflater = LayoutInflater.from(mContext);
@@ -75,5 +75,10 @@ public class DeviceListViewImpl extends BaseAdapter {
     public String TimeStamp2Date(long timestamp) {
         String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(timestamp));
         return date;
+    }
+
+    public void clearAll() {
+        mSensors.clear();
+        this.notifyDataSetChanged();
     }
 }

@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class MainActivity extends Activity {
 
-    private DeviceListViewImpl List_adapter;
+
     private Handler handler = new Handler();
 
     @Override
@@ -21,39 +21,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.device_list);
 
-        List_adapter = new DeviceListViewImpl(getApplicationContext());
         ListView lv = (ListView) findViewById(R.id.device_list);
-        lv.setAdapter(List_adapter);
-        final HomeDevice hd = new HomeDevice(1, null);
-        Sensor tmp_sensors[];
+        lv.setAdapter(new DeviceListViewAdapter(getApplicationContext()));
 
-        new Thread() {
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                super.run();
-                NetworkAccessor na = new NetworkAccessor(hd);
-                try {
-                    final Sensor sensors[] = Sensor.getSensorList(na, null);
-                    for (int i = 0; i < sensors.length; ++i) {
-                        sensors[i].update(na);
-                    }
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            List_adapter.addToSensors(sensors);
-                            List_adapter.notifyDataSetChanged();
-                        }
-                    });
 
-                } catch (IOException e) {
-                    // TODO 这真的很重要！
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
     }
 
     @Override
@@ -69,11 +40,41 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_refresh) {
             //List_adapter.addItem();
-            List_adapter.notifyDataSetChanged();
+            refreshSensorList();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshSensorList() {
+        final DeviceListViewAdapter la = (DeviceListViewAdapter) ((ListView) findViewById(R.id.device_list)).getAdapter();
+        final ControlCenter cc = new ControlCenter(1, null);
+
+        la.clearAll();
+        new Thread() {
+            @Override
+            public void run() { // Code to run in thread
+                // TODO Auto-generated method stub
+                super.run();
+                try {
+                    cc.updateSensors();
+                    handler.post(new Runnable() { // Code to run in main UI
+                        @Override
+                        public void run() {
+                            la.addToSensors(cc.getSensors());
+                            la.notifyDataSetChanged();
+                        }
+                    });
+
+                } catch (IOException e) {
+                    // TODO 这真的很重要！
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 }

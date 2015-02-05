@@ -79,7 +79,7 @@ public class LocalConfigStore {
      * @return 0失败其他成功
      */
     public int setDeviceName(int device_id, String device_name) {
-        if (device_id <= HomeDevice.INVALID_DEVICE_ID)
+        if (device_id <= ControlCenter.INVALID_DEVICE_ID)
             return 0;
 
         ContentValues cv = new ContentValues();
@@ -111,7 +111,7 @@ public class LocalConfigStore {
      * @param change_to_id 要改为的ID，不用的话设为HomeCenter.INVALID
      * @return 0失败其他成功
      */
-    public boolean updateDevice(HomeDevice mydevice, int change_to_id) {
+    public boolean updateDevice(ControlCenter mydevice, int change_to_id) {
         int device_id = mydevice.getDeviceId();
         int result = 0;
 
@@ -122,7 +122,7 @@ public class LocalConfigStore {
         // 如果1.指定了新ID 且 2.原ID能查到 就说明要修改，change就保持传入的样子不变
         // 下面这个条件是上述的反面，因为正面叙述说不清楚……以上的反面就是不用修改，把change短路掉即可
         // 用add_new代替cursor.getCount可以节约计算资源，反正就是那个结果
-        if (change_to_id == HomeDevice.INVALID_DEVICE_ID || add_new)
+        if (change_to_id == ControlCenter.INVALID_DEVICE_ID || add_new)
             change_to_id = device_id;
         result |= this.setDeviceId(add_new, change_to_id, device_id);
         result |= this.setDeviceName(device_id, mydevice.getDeviceName());
@@ -137,11 +137,11 @@ public class LocalConfigStore {
 
     private class DatabaseHelper extends SQLiteOpenHelper {
         private String CREATE_TABLE_MYDEVICE = "CREATE TABLE mydevice(" +
-                "device_id integer primary key," +
+                "device_id integer," +
                 "device_name text not null," +
                 "user_credentials text)";
         private String CREATE_TABLE_SENSORS = "CREATE TABLE sensors(" +
-                "sensor_id integer primary key, " +
+                "sensor_id integer, " +
                 "sensor_type integer not null," +
                 "sensor_name text not null," +
                 "sensor_cached_value integer," +

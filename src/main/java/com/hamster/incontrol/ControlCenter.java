@@ -1,10 +1,15 @@
 package com.hamster.incontrol;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.IOException;
+
 /**
  * Created by Hamster on 2015/1/11.
  * 描述一台主机
  */
-public class HomeDevice {
+public class ControlCenter {
     public static int INVALID_DEVICE_ID = -1;
 
     /**
@@ -18,7 +23,7 @@ public class HomeDevice {
     private String device_name;
     private Sensor sensors[];
 
-    HomeDevice(int device_id, String credentials) {
+    ControlCenter(int device_id, String credentials) {
         this.device_id = device_id;
         this.credentials = credentials;
     }
@@ -62,4 +67,20 @@ public class HomeDevice {
         this.credentials = credentials;
     }
 
+    /**
+     * 更新此ControlCenter下的所有传感器
+     */
+    public void updateSensors() throws IOException, JSONException {
+        JSONArray jsonArray = NetworkAccessor.fetchSensorListJSON(this);
+
+        this.sensors = null; // To keep that fresh w/o memory leak?
+        this.sensors = new Sensor[jsonArray.length()];
+        for (int i = 0; i < sensors.length; ++i) {
+            sensors[i] = new Sensor(this);
+            sensors[i].setSensorId(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY));
+            sensors[i].setSensorType(Sensor.convertIntToType(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_TYPE_KEY)));
+            sensors[i].setSensorName(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_NAME_KEY));
+            sensors[i].setSensorCachedValue(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_VALUE_KEY));
+        }
+    }
 }

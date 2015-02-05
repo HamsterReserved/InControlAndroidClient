@@ -1,6 +1,5 @@
 package com.hamster.incontrol;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,7 +16,7 @@ public class Sensor {
      * 传感器类型，从0起始，后续有待添加。
      * 请保持与云端PHP、单片机程序中的int值一致！
      */
-    public enum SensorType {
+    public static enum SensorType {
         SENSOR_LIGHT,
         SENSOR_ELECTRICITY,
         SENSOR_MOTION,
@@ -25,11 +24,6 @@ public class Sensor {
         SENSOR_IR,
         SENSOR_UNKNOWN
     }
-
-    private static final String JSON_SENSOR_ID_KEY = "sensor_id";
-    private static final String JSON_SENSOR_NAME_KEY = "sensor_name";
-    private static final String JSON_SENSOR_TYPE_KEY = "sensor_type";
-    private static final String JSON_SENSOR_VALUE_KEY = "sensor_info";
 
     /**
      * 默认的无效传感器ID，表明此实例还没有初始化
@@ -39,7 +33,7 @@ public class Sensor {
     /**************************类成员*************************/
 
     /**
-     * 传感器ID，必须，只能通过构造函数传入，但可以读出
+     * 传感器ID，必须
      */
     private int mSensorId = INVALID_SENSOR_ID;
     /**
@@ -52,10 +46,14 @@ public class Sensor {
     private SensorType mSensorType;
     private String mSensorCachedValue;
     private long mLastUpdateDate;
+    private ControlCenter mParentControlCenter;
 
-    Sensor(int sensor_id) {
+    /**
+     * @param parent_cc 所属ControlCenter
+     */
+    Sensor(ControlCenter parent_cc) {
         super();
-        this.mSensorId = sensor_id;
+        this.mParentControlCenter = parent_cc;
     }
 
     public static SensorType convertIntToType(int conv) {
@@ -66,32 +64,12 @@ public class Sensor {
         }
     }
 
-    /**
-     * 查询所有可用的传感器
-     *
-     * @param na         已初始化有device_id的NetworkAccessor实例
-     * @param sensorType （不是必须）需要的传感器类型，可以过滤用
-     * @return 传感器数组
-     */
-    public static Sensor[] getSensorList(NetworkAccessor na, SensorType sensorType) throws IOException, JSONException {
-        JSONArray jsonArray = na.updateSensorListJSON();
+    public int getSensorId() {
+        return mSensorId;
+    }
 
-        Sensor[] sensors = new Sensor[jsonArray.length()];
-        for (int i = 0; i < sensors.length; ++i) {
-            if (sensorType != null) {
-                if (convertIntToType(jsonArray.getJSONObject(i).getInt(JSON_SENSOR_TYPE_KEY)) == sensorType) {
-                    sensors[i] = new Sensor(jsonArray.getJSONObject(i).getInt(JSON_SENSOR_ID_KEY));
-                    sensors[i].setSensorType(sensorType);
-                    sensors[i].setSensorName(jsonArray.getJSONObject(i).getString(JSON_SENSOR_NAME_KEY));
-                }
-            } else {
-                sensors[i] = new Sensor(jsonArray.getJSONObject(i).getInt(JSON_SENSOR_ID_KEY));
-                sensors[i].setSensorType(convertIntToType(jsonArray.getJSONObject(i).getInt(JSON_SENSOR_TYPE_KEY)));
-                sensors[i].setSensorName(jsonArray.getJSONObject(i).getString(JSON_SENSOR_NAME_KEY));
-            }
-        }
-
-        return sensors;
+    public void setSensorId(int mSensorId) {
+        this.mSensorId = mSensorId;
     }
 
     public int getSensorTypeInt() {
@@ -103,12 +81,7 @@ public class Sensor {
     }
 
     public void setSensorType(SensorType mSensorType) {
-        System.out.println(mSensorType.toString());
         this.mSensorType = mSensorType;
-    }
-
-    public int getSensorId() {
-        return mSensorId;
     }
 
     public String getSensorName() {
@@ -122,6 +95,16 @@ public class Sensor {
      */
     public void setSensorName(String mSensorName) {
         this.setSensorName(mSensorName, false);
+    }
+
+    /**
+     * 注意这里还会同时设定更新日期
+     *
+     * @param mSensorCachedValue
+     */
+    public void setSensorCachedValue(String mSensorCachedValue) {
+        this.mSensorCachedValue = mSensorCachedValue;
+        this.mLastUpdateDate = System.currentTimeMillis();
     }
 
     public String getSensorCachedValue() {
@@ -151,12 +134,20 @@ public class Sensor {
         }
     }
 
+    public ControlCenter getParentControlCenter() {
+        return mParentControlCenter;
+    }
+
+    public void setParentControlCenter(ControlCenter mParentControlCenter) {
+        this.mParentControlCenter = mParentControlCenter;
+    }
+
     public boolean isInfoComplete() {
         return mSensorId != INVALID_SENSOR_ID;
     }
 
     /**
-     * 查询指定传感器信息D
+     * 查询指定传感器信息（不知道这是干嘛的，明明在ControlCenter已经有了刷新列表的功能）
      *
      * @param na 已初始化有HomeDevice的NetworkAccessor实例
      * @throws IOException   网络错误
@@ -166,10 +157,10 @@ public class Sensor {
         if (this.isInfoComplete()) {
             JSONObject json;
 
-            json = na.updateSensorInfoJSON(mSensorId);
-            this.setSensorName(json.getString(JSON_SENSOR_NAME_KEY), false);
-            this.setSensorType(convertIntToType(json.getInt(JSON_SENSOR_TYPE_KEY)));
-            mSensorCachedValue = json.getString(JSON_SENSOR_VALUE_KEY);
+            json = NetworkAccessor.fetchSensorInfoJSON(mSensorId, mParentControlCenter);
+            this.setSensorName(json.getString(NetworkAccessor.JSON_SENSOR_NAME_KEY), false);
+            this.setSensorType(convertIntToType(json.getInt(NetworkAccessor.JSON_SENSOR_TYPE_KEY)));
+            mSensorCachedValue = json.getString(NetworkAccessor.JSON_SENSOR_VALUE_KEY);
             mLastUpdateDate = System.currentTimeMillis();
         } else {
             throw new IllegalArgumentException("Sensor ID not defined!");

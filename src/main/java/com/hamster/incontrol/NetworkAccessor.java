@@ -29,27 +29,29 @@ public class NetworkAccessor {
     /**
      * 查询所有传感器
      */
-    public int REQUEST_TYPE_QUERY_SENSORS = 1;
+    public static int REQUEST_TYPE_QUERY_SENSORS = 1;
     /**
      * 查询某一传感器的具体值
      */
-    public int REQUEST_TYPE_QUERY_SENSOR_INFO = 2;
+    public static int REQUEST_TYPE_QUERY_SENSOR_INFO = 2;
+    /**
+     * 设备类型，这个数值应与PHP保持一致，不能修改
+     */
+    private static int DEVICE_TYPE = 2;
 
-    private final int DEVICE_TYPE = 2; // 设备类型是客户端，不可修改
-    private HomeDevice device;
-
-    NetworkAccessor(HomeDevice mydevice) {
-        super();
-        this.device = mydevice;
-    }
+    public static final String JSON_SENSOR_ID_KEY = "sensor_id";
+    public static final String JSON_SENSOR_NAME_KEY = "sensor_name";
+    public static final String JSON_SENSOR_TYPE_KEY = "sensor_type";
+    public static final String JSON_SENSOR_VALUE_KEY = "sensor_info";
 
     /**
+     * @deprecated PHP端已改为直接返回带数据的列表
      * 更新指定传感器的值
      *
      * @param sensor_id 传感器ID
      * @return 此传感器数据的JSON对象
      */
-    public JSONObject updateSensorInfoJSON(int sensor_id) throws IOException, JSONException {
+    public static JSONObject fetchSensorInfoJSON(int sensor_id, ControlCenter device) throws IOException, JSONException {
         Map<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("device_id", String.valueOf(device.getDeviceId()));
         paramMap.put("device_type", String.valueOf(DEVICE_TYPE));
@@ -80,9 +82,9 @@ public class NetworkAccessor {
     /**
      * 获取传感器列表
      *
-     * @return JSONArray，传感器数组
+     * @return JSONArray 传感器数组
      */
-    public JSONArray updateSensorListJSON() throws IOException, JSONException {
+    public static JSONArray fetchSensorListJSON(ControlCenter device) throws IOException, JSONException {
         Map<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("device_id", String.valueOf(device.getDeviceId()));
         paramMap.put("device_type", String.valueOf(DEVICE_TYPE));
@@ -106,7 +108,7 @@ public class NetworkAccessor {
         }
     }
 
-    private String buildUrlWithParams(Map map) {
+    private static String buildUrlWithParams(Map map) {
         StringBuilder sb = new StringBuilder(INCONTROL_API_URL);
         Set entryset = map.entrySet();
         Iterator iter = entryset.iterator();

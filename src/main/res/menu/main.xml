@@ -3,6 +3,13 @@
     tools:context="com.hamster.incontrol.MainActivity">
 
     <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:title="@string/action_refresh" />
+
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
