@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.hamster.incontrol.ControlCenterActivity">
+    <item
+        android:id="@+id/action_control_center_add"
+        android:title="@string/action_control_center_add"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_add" />
+</menu>

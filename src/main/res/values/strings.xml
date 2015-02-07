@@ -8,5 +8,8 @@
     <string name="def_sensor_name">Sensor Name</string>
     <string name="def_device_name">Device Name</string>
     <string name="action_refresh">Refresh</string>
+    <string name="title_activity_control_center">InControl Centers</string>
+    <string name="action_control_center_add">Add</string>
+    <string name="text_empty_centers">No InControl centers defined.\nPlease use Edit->Add.</string>
 
 </resources>

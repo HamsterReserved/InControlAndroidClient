@@ -53,6 +53,6 @@
         android:layout_alignBottom="@id/sensor_name"
         android:paddingLeft="5dp"
         android:layout_toRightOf="@id/sensor_name"
-        android:textColor="#666666"/>
+        android:textColor="#666666" />
 
 </RelativeLayout>

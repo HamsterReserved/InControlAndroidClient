@@ -1,5 +1,7 @@
 package com.hamster.incontrol;
 
+import android.content.Context;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,13 +49,15 @@ public class Sensor {
     private String mSensorCachedValue;
     private long mLastUpdateDate;
     private ControlCenter mParentControlCenter;
+    private Context mContext;
 
     /**
      * @param parent_cc 所属ControlCenter
      */
-    Sensor(ControlCenter parent_cc) {
+    Sensor(ControlCenter parent_cc, Context ctx) {
         super();
         this.mParentControlCenter = parent_cc;
+        this.mContext = ctx;
     }
 
     public static SensorType convertIntToType(int conv) {
@@ -147,11 +151,10 @@ public class Sensor {
     }
 
     /**
-     * 查询指定传感器信息（不知道这是干嘛的，明明在ControlCenter已经有了刷新列表的功能）
-     *
      * @param na 已初始化有HomeDevice的NetworkAccessor实例
      * @throws IOException   网络错误
      * @throws JSONException JSON格式错误
+     * @deprecated 查询指定传感器信息（不知道这是干嘛的，明明在ControlCenter已经有了刷新列表的功能）
      */
     public void update(NetworkAccessor na) throws IOException, JSONException {
         if (this.isInfoComplete()) {
@@ -165,5 +168,10 @@ public class Sensor {
         } else {
             throw new IllegalArgumentException("Sensor ID not defined!");
         }
+    }
+
+    public void saveToDatabase() {
+        LocalConfigStore lcs = new LocalConfigStore(this.mContext);
+
     }
 }

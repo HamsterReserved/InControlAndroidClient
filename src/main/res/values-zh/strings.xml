@@ -6,4 +6,7 @@
     <string name="action_settings">设置</string>
     <string name="def_device_name">主机名称</string>
     <string name="action_refresh">刷新</string>
+    <string name="title_activity_control_center">InControl控制器管理</string>
+    <string name="action_control_center_add">增加</string>
+    <string name="text_empty_centers">未添加任何控制器。\n请点击“编辑”-“新增”按钮。</string>
 </resources>

@@ -55,7 +55,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         //TODO: Implement!
         if (convertView == null)
-            convertView = mInflater.inflate(R.layout.device_info_detail, null);
+            convertView = mInflater.inflate(R.layout.sensor_info_detail, null);
         TextView sensor_name = (TextView) convertView.findViewById(R.id.sensor_name);
         TextView device_name = (TextView) convertView.findViewById(R.id.device_name);
         TextView status_message = (TextView) convertView.findViewById(R.id.status_message);
@@ -64,7 +64,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
 
         Sensor this_sensor = mSensors.get(position);
         sensor_name.setText(this_sensor.getSensorName());
-        device_name.setText("From Device: Test");
+        device_name.setText("@" + this_sensor.getParentControlCenter().getDeviceName());
         status_message.setText("Current value: " + this_sensor.getSensorCachedValue());
         update_time.setText(TimeStamp2Date(this_sensor.getLastUpdateDate()));
         //image.setPic(this_sens.getType)

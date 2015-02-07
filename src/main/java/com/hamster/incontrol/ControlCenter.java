@@ -1,5 +1,7 @@
 package com.hamster.incontrol;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -22,10 +24,17 @@ public class ControlCenter {
     private String credentials;
     private String device_name;
     private Sensor sensors[];
+    private Context context;
 
-    ControlCenter(int device_id, String credentials) {
+    ControlCenter(int device_id, String credentials, Context ctx) {
         this.device_id = device_id;
         this.credentials = credentials;
+        this.context = ctx;
+    }
+
+    // 用它反过来操作数据库
+    ControlCenter(Context ctx) {
+        this.context = ctx;
     }
 
     public boolean isInfoComplete() {
@@ -76,7 +85,7 @@ public class ControlCenter {
         this.sensors = null; // To keep that fresh w/o memory leak?
         this.sensors = new Sensor[jsonArray.length()];
         for (int i = 0; i < sensors.length; ++i) {
-            sensors[i] = new Sensor(this);
+            sensors[i] = new Sensor(this, this.context);
             sensors[i].setSensorId(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY));
             sensors[i].setSensorType(Sensor.convertIntToType(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_TYPE_KEY)));
             sensors[i].setSensorName(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_NAME_KEY));
