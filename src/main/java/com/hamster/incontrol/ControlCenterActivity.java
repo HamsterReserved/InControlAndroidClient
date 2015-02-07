@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +15,8 @@ import android.widget.ListView;
 
 
 public class ControlCenterActivity extends Activity {
+
+    private Handler hnd = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,7 @@ public class ControlCenterActivity extends Activity {
                 ((ListView) findViewById(R.id.manage_device_list)).getAdapter();
         LocalConfigStore lcs = new LocalConfigStore(this.getApplicationContext());
         lcs.open();
+        lv_adapter.clearAll();
         lv_adapter.addToControlCenters(lcs.getControlCenters());
         lcs.close();
     }
@@ -88,6 +92,12 @@ public class ControlCenterActivity extends Activity {
                 cc.setDeviceName(et_cc_name.getText().toString());
                 cc.setCredentials(et_cc_cred.getText().toString());
                 if (cc.isInfoComplete()) lcs.updateDevice(cc, ControlCenter.INVALID_DEVICE_ID);
+                hnd.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadControllers();
+                    }
+                });
             }
         };
 
