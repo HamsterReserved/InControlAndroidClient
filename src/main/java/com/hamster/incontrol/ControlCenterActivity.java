@@ -68,14 +68,11 @@ public class ControlCenterActivity extends Activity {
         // Copied from net
         AlertDialog.Builder builder;
         final AlertDialog alertDialog;
-        Context mContext = this;
+        final Context mContext = this;
 
-        final LocalConfigStore lcs = new LocalConfigStore(mContext);
-        lcs.open();
-
+        final
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.control_center_edit_dialog,
-                null);
+        View layout = inflater.inflate(R.layout.control_center_edit_dialog, null);
         builder = new AlertDialog.Builder(mContext);
         builder.setView(layout)
                 .setNegativeButton("Cancel", null)
@@ -87,11 +84,19 @@ public class ControlCenterActivity extends Activity {
                 EditText et_cc_id = (EditText) alertDialog.findViewById(R.id.et_control_id);
                 EditText et_cc_name = (EditText) alertDialog.findViewById(R.id.et_control_name);
                 EditText et_cc_cred = (EditText) alertDialog.findViewById(R.id.et_control_cred);
+
                 ControlCenter cc = new ControlCenter(getApplicationContext());
                 cc.setDeviceId(Integer.parseInt(et_cc_id.getText().toString()));
                 cc.setDeviceName(et_cc_name.getText().toString());
                 cc.setCredentials(et_cc_cred.getText().toString());
+
+                LocalConfigStore lcs = new LocalConfigStore(mContext);
+                lcs.open();
+
                 if (cc.isInfoComplete()) lcs.updateDevice(cc, ControlCenter.INVALID_DEVICE_ID);
+
+                lcs.close();
+
                 hnd.post(new Runnable() {
                     @Override
                     public void run() {
@@ -101,7 +106,7 @@ public class ControlCenterActivity extends Activity {
             }
         };
 
-        alertDialog.setButton("OK", ocl_positive);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", ocl_positive);
         alertDialog.show();
     }
 }

@@ -1,5 +1,7 @@
 package com.hamster.incontrol;
 
+import android.util.Log;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -21,6 +23,7 @@ import java.util.Set;
  * 用来从云端读取主机数据的类
  */
 public class NetworkAccessor {
+    private static final String LOG_TAG = "InControl_NA";
     /**
      * API地址
      */
@@ -43,6 +46,7 @@ public class NetworkAccessor {
     public static final String JSON_SENSOR_NAME_KEY = "sensor_name";
     public static final String JSON_SENSOR_TYPE_KEY = "sensor_type";
     public static final String JSON_SENSOR_VALUE_KEY = "sensor_info";
+    public static final String JSON_SENSOR_DATE_KEY = "sensor_date";
 
     /**
      * @deprecated PHP端已改为直接返回带数据的列表
@@ -52,6 +56,7 @@ public class NetworkAccessor {
      * @return 此传感器数据的JSON对象
      */
     public static JSONObject fetchSensorInfoJSON(int sensor_id, ControlCenter device) throws IOException, JSONException {
+        Log.v(LOG_TAG, "fetchSensorInfoJSON() entered");
         Map<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("device_id", String.valueOf(device.getDeviceId()));
         paramMap.put("device_type", String.valueOf(DEVICE_TYPE));
@@ -60,19 +65,26 @@ public class NetworkAccessor {
 
         HttpGet httpGet = new HttpGet(buildUrlWithParams(paramMap));
         HttpClient httpClient = new DefaultHttpClient();
+        Log.v(LOG_TAG, "fetchSensorListJSON() ready to sent request");
         HttpResponse httpResponse = httpClient.execute(httpGet);
+        Log.v(LOG_TAG, "fetchSensorListJSON() got response");
 
         if (httpResponse.getStatusLine().getStatusCode() == 200) {
+            Log.v(LOG_TAG, "fetchSensorListJSON() status code = 200");
             String retStr = EntityUtils.toString(httpResponse.getEntity());
 
             JSONObject json = new JSONObject(retStr);
             return json;
         } else if (httpResponse.getStatusLine().getStatusCode() == 501) { // "Not implemented"
             // TODO 程序会卡!
+            Log.e(LOG_TAG, "fetchSensorListJSON() status code = 501, msg="
+                    + EntityUtils.toString(httpResponse.getEntity()));
             throw new IOException("URL Parameters Error! Detail: "
                     + EntityUtils.toString(httpResponse.getEntity()));
         } else {
             // TODO 程序会卡！
+            Log.e(LOG_TAG, "fetchSensorListJSON() status code = (unknown) "
+                    + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
             throw new IOException("HTTP Return Code unknown: "
                     + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
         }

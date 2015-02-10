@@ -101,18 +101,17 @@ public class Sensor {
         this.setSensorName(mSensorName, false);
     }
 
-    /**
-     * 注意这里还会同时设定更新日期
-     *
-     * @param mSensorCachedValue
-     */
     public void setSensorCachedValue(String mSensorCachedValue) {
         this.mSensorCachedValue = mSensorCachedValue;
-        this.mLastUpdateDate = System.currentTimeMillis();
     }
+
 
     public String getSensorCachedValue() {
         return mSensorCachedValue;
+    }
+
+    public void setLastUpdateDate(int dt) {
+        this.mLastUpdateDate = dt;
     }
 
     public long getLastUpdateDate() {
@@ -151,6 +150,7 @@ public class Sensor {
     }
 
     /**
+     * @deprecated 请对每一个ControlCenter使用其updateSensors，不必单独更新每个Sensor
      * @param na 已初始化有HomeDevice的NetworkAccessor实例
      * @throws IOException   网络错误
      * @throws JSONException JSON格式错误
@@ -172,6 +172,8 @@ public class Sensor {
 
     public void saveToDatabase() {
         LocalConfigStore lcs = new LocalConfigStore(this.mContext);
-
+        lcs.open();
+        lcs.updateSensor(this, Sensor.INVALID_SENSOR_ID);
+        lcs.close();
     }
 }

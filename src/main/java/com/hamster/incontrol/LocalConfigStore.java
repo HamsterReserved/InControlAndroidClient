@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * 配置中心，也可以读写数据库
@@ -18,20 +19,21 @@ import android.database.sqlite.SQLiteOpenHelper;
  * 用前open，用后close
  */
 public class LocalConfigStore {
-    public static int DB_VERSION = 1;
-    public static String DEFAULT_DB_FILENAME = "incontrol_android.db";
+    private static int DB_VERSION = 1;
+    private static String LOG_TAG = "InControl_LCS";
+    private static String DEFAULT_DB_FILENAME = "incontrol_android.db";
 
-    public static String MYDEVICE_TABLE_NAME = "mydevice";
-    public static String SENSORS_TABLE_NAME = "sensors";
-    public static String DEVICE_ID_KEY = "device_id"; // in mydevice
-    public static String DEVICE_NAME_KEY = "device_name";
-    public static String DEVICE_CREDENTIALS_KEY = "user_credentials";
-    public static String SENSOR_ID_KEY = "sensor_id"; // sensors table
-    public static String SENSOR_NAME_KEY = "sensor_name";
-    public static String SENSOR_TYPE_KEY = "sensor_type";
-    public static String SENSOR_CACHED_VALUE_KEY = "sensor_cached_value";
-    public static String SENSOR_UPDATE_DATE_KEY = "sensor_update_date";
-    public static String SENSOR_PARENT_CONTROL_ID_KEY = "sensor_parent_control_id";
+    private static String MYDEVICE_TABLE_NAME = "mydevice";
+    private static String SENSORS_TABLE_NAME = "sensors";
+    private static String DEVICE_ID_KEY = "device_id"; // in mydevice
+    private static String DEVICE_NAME_KEY = "device_name";
+    private static String DEVICE_CREDENTIALS_KEY = "user_credentials";
+    private static String SENSOR_ID_KEY = "sensor_id"; // sensors table
+    private static String SENSOR_NAME_KEY = "sensor_name";
+    private static String SENSOR_TYPE_KEY = "sensor_type";
+    private static String SENSOR_CACHED_VALUE_KEY = "sensor_cached_value";
+    private static String SENSOR_UPDATE_DATE_KEY = "sensor_update_date";
+    private static String SENSOR_PARENT_CONTROL_ID_KEY = "sensor_parent_control_id";
 
     private Context mContext;
     private DatabaseHelper dbhelper;
@@ -42,55 +44,16 @@ public class LocalConfigStore {
         dbhelper = new DatabaseHelper(this.mContext);
     }
 
-    LocalConfigStore open() {
+    void open() {
         db = dbhelper.getWritableDatabase();
-        return this; // 这个是为了能实现.open().write().close()这种的吧？
+        Log.v(LOG_TAG, "open() is called.");
     }
 
     public void close() {
         db.close();
         db = null;
         dbhelper.close();
-    }
-
-    /**
-     * 设置指定表中指定列的值
-     *
-     * @param table_name 目标表名
-     * @param req_id     要修改的ID
-     * @param id_key     ID所在列名
-     * @param column     目标列
-     * @param upd_data   要改为的数值
-     * @return 0失败其他成功
-     */
-    public int updateColumn(String table_name, int req_id, String id_key, String column, long upd_data) {
-        if (req_id <= Sensor.INVALID_SENSOR_ID) // They are the same...
-            return 0;
-
-        ContentValues cv = new ContentValues();
-        cv.put(column, upd_data);
-
-        return db.update(table_name, cv, id_key + "=" + String.valueOf(req_id), null);
-    }
-
-    /**
-     * 通用：设置指定表中指定列的值
-     *
-     * @param table_name 目标表名
-     * @param req_id     要修改的ID
-     * @param id_key     ID所在列名
-     * @param column     目标列
-     * @param upd_data   要改为的字符串
-     * @return 0失败其他成功
-     */
-    public int updateColumn(String table_name, int req_id, String id_key, String column, String upd_data) {
-        if (req_id <= Sensor.INVALID_SENSOR_ID) // They are the same...
-            return 0;
-
-        ContentValues cv = new ContentValues();
-        cv.put(column, upd_data);
-
-        return db.update(table_name, cv, id_key + "=" + String.valueOf(req_id), null);
+        Log.v(LOG_TAG, "close() is called.");
     }
 
     /**
@@ -162,10 +125,15 @@ public class LocalConfigStore {
         if (change_to_id == ControlCenter.INVALID_DEVICE_ID || add_new)
             change_to_id = device_id;
         result |= updateDeviceId(add_new, change_to_id, device_id);
-        result |= updateColumn(MYDEVICE_TABLE_NAME, device_id, DEVICE_ID_KEY,
-                DEVICE_NAME_KEY, new_device.getDeviceName());
-        result |= updateColumn(MYDEVICE_TABLE_NAME, device_id, DEVICE_ID_KEY,
-                DEVICE_CREDENTIALS_KEY, new_device.getCredentials());
+
+        // 更新name和cred，上面只更新了ID
+        ContentValues cv = new ContentValues();
+        cv.put(DEVICE_NAME_KEY, new_device.getDeviceName());
+        cv.put(DEVICE_CREDENTIALS_KEY, new_device.getCredentials());
+
+        result |= db.update(MYDEVICE_TABLE_NAME, cv,
+                DEVICE_ID_KEY + " = ?",
+                new String[]{String.valueOf(change_to_id)});
         return result != 0;
     }
 
@@ -191,18 +159,21 @@ public class LocalConfigStore {
         // 如果1.指定了新ID 且 2.原ID能查到 就说明要修改，change就保持传入的样子不变
         // 下面这个条件是上述的反面，因为正面叙述说不清楚……以上的反面就是不用修改，把change短路掉即可
         // 用add_new代替cursor.getCount可以节约计算资源，反正就是那个结果
-        // TODO: Insert them with one ContentValues!
         if (change_to_id == Sensor.INVALID_SENSOR_ID || add_new)
             change_to_id = sensor_id;
         result |= this.updateSensorId(add_new, change_to_id, sensor_id);
-        result |= this.updateColumn(SENSORS_TABLE_NAME, sensor_id, SENSOR_ID_KEY,
-                SENSOR_NAME_KEY, snr.getSensorName());
-        result |= this.updateColumn(SENSORS_TABLE_NAME, sensor_id, SENSOR_ID_KEY,
-                SENSOR_UPDATE_DATE_KEY, snr.getLastUpdateDate());
-        result |= this.updateColumn(SENSORS_TABLE_NAME, sensor_id, SENSOR_ID_KEY,
-                SENSOR_CACHED_VALUE_KEY, snr.getSensorCachedValue());
-        result |= this.updateColumn(SENSORS_TABLE_NAME, sensor_id, SENSOR_ID_KEY,
-                SENSOR_PARENT_CONTROL_ID_KEY, snr.getParentControlCenter().getDeviceId());
+
+        // 更新剩下的项目
+        ContentValues cv = new ContentValues();
+        cv.put(SENSOR_NAME_KEY, snr.getSensorName());
+        cv.put(SENSOR_TYPE_KEY, snr.getSensorTypeInt());
+        cv.put(SENSOR_UPDATE_DATE_KEY, snr.getLastUpdateDate());
+        cv.put(SENSOR_CACHED_VALUE_KEY, snr.getSensorCachedValue());
+        cv.put(SENSOR_PARENT_CONTROL_ID_KEY, snr.getParentControlCenter().getDeviceId());
+
+        result |= db.update(SENSORS_TABLE_NAME, cv,
+                SENSOR_ID_KEY + " = ?",
+                new String[]{String.valueOf(change_to_id)});
         return result != 0;
     }
 
@@ -236,6 +207,43 @@ public class LocalConfigStore {
         return ccs;
     }
 
+    /**
+     * 获取指定ControlCenter下属的所有缓存的Sensor
+     *
+     * @param cc 要查询的ControlCenter
+     * @return 查到的Sensors
+     */
+    public Sensor[] getSensors(ControlCenter cc) {
+        Cursor cursor = db.query(SENSORS_TABLE_NAME,
+                new String[]{SENSOR_ID_KEY,
+                        SENSOR_NAME_KEY,
+                        SENSOR_TYPE_KEY,
+                        SENSOR_UPDATE_DATE_KEY,
+                        SENSOR_CACHED_VALUE_KEY},
+                SENSOR_PARENT_CONTROL_ID_KEY + " = ?",
+                new String[]{String.valueOf(cc.getDeviceId())},
+                null, null, null);
+
+        int sensor_count = cursor.getCount();
+        if (sensor_count == 0) {
+            cursor.close();
+            return null;
+        }
+
+        Sensor[] sensors = new Sensor[sensor_count];
+        cursor.moveToFirst();
+        int i = 0;
+        while (i < sensor_count) {
+            sensors[i] = new Sensor(cc, mContext);
+            sensors[i].setSensorId(cursor.getInt(0));
+            sensors[i].setSensorName(cursor.getString(1));
+            sensors[i].setSensorType(Sensor.convertIntToType(cursor.getInt(2)));
+            sensors[i].setLastUpdateDate(cursor.getInt(3));
+            sensors[i].setSensorCachedValue(cursor.getString(4));
+        }
+        return sensors;
+    }
+
     private class DatabaseHelper extends SQLiteOpenHelper {
         private String CREATE_TABLE_MYDEVICE = "CREATE TABLE mydevice(" +
                 "device_id integer," +
@@ -245,7 +253,7 @@ public class LocalConfigStore {
                 "sensor_id integer, " +
                 "sensor_type integer," +
                 "sensor_name text," +
-                "sensor_cached_value integer," +
+                "sensor_cached_value text," +
                 "sensor_update_date integer," +
                 "sensor_parent_control_id integer)";
 
