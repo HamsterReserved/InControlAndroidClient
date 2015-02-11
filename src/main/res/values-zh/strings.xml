@@ -17,4 +17,5 @@
     <string name="dialog_title_add_new_center">添加新的InControl控制器</string>
     <string name="current_value">当前值：</string>
     <string name="toast_error_loading_sensors">传感器数据加载出错！</string>
+    <string name="def_device_id">设备ID</string>
 </resources>

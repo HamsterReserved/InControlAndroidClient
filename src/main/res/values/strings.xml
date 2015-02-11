@@ -19,5 +19,6 @@
     <string name="button_ok">OK</string>
     <string name="current_value">Current Value:</string>
     <string name="toast_error_loading_sensors">Error loading sensors!</string>
+    <string name="def_device_id">Device ID</string>
 
 </resources>

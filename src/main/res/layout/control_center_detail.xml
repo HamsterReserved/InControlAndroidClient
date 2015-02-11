@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Device name"
+        android:text="@string/def_device_name"
         android:textSize="22sp"
         android:textColor="@android:color/black"
         android:id="@+id/tv_control_center_name"
@@ -19,9 +19,19 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Device ID"
+        android:text="@string/def_device_id"
         android:textSize="18sp"
         android:textColor="@android:color/black"
         android:id="@+id/tv_control_center_id"
         android:layout_below="@+id/tv_control_center_name" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/device_popup_menu"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_more" />
 </RelativeLayout>
