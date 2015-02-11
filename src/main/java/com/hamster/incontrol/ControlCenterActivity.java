@@ -1,6 +1,5 @@
 package com.hamster.incontrol;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +14,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 
-public class ControlCenterActivity extends Activity {
+public class ControlCenterActivity extends TintedStatusBarActivity {
 
     private Handler hnd = new Handler();
 

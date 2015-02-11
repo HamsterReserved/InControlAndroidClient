@@ -60,7 +60,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
         TextView device_name = (TextView) convertView.findViewById(R.id.device_name);
         TextView status_message = (TextView) convertView.findViewById(R.id.status_message);
         TextView update_time = (TextView) convertView.findViewById(R.id.update_time);
-        ImageView image = (ImageView) convertView.findViewById(R.id.device_pic);
+        ImageView image = (ImageView) convertView.findViewById(R.id.sensor_pic);
 
         Sensor this_sensor = mSensors.get(position);
         sensor_name.setText(this_sensor.getSensorName());
@@ -74,8 +74,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
     }
 
     public String TimeStamp2Date(long timestamp) {
-        String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(timestamp * 1000));
-        return date;
+        return new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(timestamp * 1000));
     }
 
     public void clearAll() {

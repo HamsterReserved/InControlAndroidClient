@@ -3,9 +3,9 @@
     android:id="@+id/device_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#eeeeee"
     android:clipToPadding="false"
     android:divider="@android:color/transparent"
+    android:background="@android:color/transparent"
     android:dividerHeight="10dp"
     android:padding="10dp"
-    android:scrollbarStyle="outsideOverlay"></ListView>
+    android:scrollbarStyle="outsideOverlay" />
