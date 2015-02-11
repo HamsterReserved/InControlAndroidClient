@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DeviceDetailViewAdapter extends BaseAdapter {
 
@@ -27,9 +28,7 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
 
     public void addToControlCenters(ControlCenter new_ccs[]) {
         if (new_ccs == null) return;
-        for (int i = 0; i < new_ccs.length; ++i) {
-            mCenters.add(new_ccs[i]);
-        }
+        mCenters.addAll(Arrays.asList(new_ccs));
     }
 
     @Override

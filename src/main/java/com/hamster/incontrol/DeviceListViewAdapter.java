@@ -65,7 +65,8 @@ public class DeviceListViewAdapter extends BaseAdapter {
         Sensor this_sensor = mSensors.get(position);
         sensor_name.setText(this_sensor.getSensorName());
         device_name.setText("@" + this_sensor.getParentControlCenter().getDeviceName());
-        status_message.setText("Current value: " + this_sensor.getSensorCachedValue());
+        status_message.setText(mContext.getResources().getText(R.string.current_value)
+                + this_sensor.getSensorCachedValue());
         update_time.setText(TimeStamp2Date(this_sensor.getLastUpdateDate()));
         //image.setPic(this_sens.getType)
 
@@ -73,7 +74,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
     }
 
     public String TimeStamp2Date(long timestamp) {
-        String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(timestamp));
+        String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(timestamp * 1000));
         return date;
     }
 

@@ -11,19 +11,19 @@
         android:layout_height="wrap_content"
         android:id="@+id/et_control_id"
         android:layout_weight="1"
-        android:hint="InControl Controller ID" />
+        android:hint="@string/text_hint_controller_id" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/et_control_name"
         android:layout_weight="1"
-        android:hint="Controller Name" />
+        android:hint="@string/text_hint_controller_name" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/et_control_cred"
         android:layout_weight="1"
-        android:hint="Credentials" />
+        android:hint="@string/text_hint_user_credentials" />
 </LinearLayout>

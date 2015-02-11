@@ -9,4 +9,12 @@
     <string name="title_activity_control_center">InControl控制器管理</string>
     <string name="action_control_center_add">增加</string>
     <string name="text_empty_centers">未添加任何控制器。\n请点击“编辑”-“新增”按钮。</string>
+    <string name="text_hint_controller_id">InControl 控制器ID</string>
+    <string name="text_hint_controller_name">自定义控制器名称</string>
+    <string name="text_hint_user_credentials">控制器显示的密码</string>
+    <string name="button_cancel">取消</string>
+    <string name="button_ok">确定</string>
+    <string name="dialog_title_add_new_center">添加新的InControl控制器</string>
+    <string name="current_value">当前值：</string>
+    <string name="toast_error_loading_sensors">传感器数据加载出错！</string>
 </resources>

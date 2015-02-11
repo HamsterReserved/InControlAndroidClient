@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -66,17 +67,18 @@ public class ControlCenterActivity extends Activity {
 
     private void showEditDialog() { // TODO Currently only supports adding a new one
         // Copied from net
+        Resources res = getResources();
         AlertDialog.Builder builder;
         final AlertDialog alertDialog;
         final Context mContext = this;
+        final LayoutInflater inflater =
+                (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
 
-        final
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.control_center_edit_dialog, null);
         builder = new AlertDialog.Builder(mContext);
         builder.setView(layout)
-                .setNegativeButton("Cancel", null)
-                .setTitle("Add a new InControl Center");
+                .setNegativeButton(res.getText(R.string.button_cancel), null)
+                .setTitle(res.getText(R.string.dialog_title_add_new_center));
         alertDialog = builder.create();
 
         DialogInterface.OnClickListener ocl_positive = new DialogInterface.OnClickListener() {
@@ -106,7 +108,7 @@ public class ControlCenterActivity extends Activity {
             }
         };
 
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", ocl_positive);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, res.getText(R.string.button_ok), ocl_positive);
         alertDialog.show();
     }
 }

@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
                         ViewGroup.LayoutParams.MATCH_PARENT)); // Auto-select FrameLayout
         empty_tv.setGravity(Gravity.CENTER);
         empty_tv.setTextColor(Color.GRAY);
-        empty_tv.setTextSize(22);
+        empty_tv.setTextSize(getResources().getDimension(R.dimen.text_size_empty_centers));
         lv.setEmptyView(empty_tv);
 
         refreshSensorList();
@@ -79,12 +79,19 @@ public class MainActivity extends Activity {
             public void run() { // Code to run in thread
                 // TODO Auto-generated method stub
                 super.run();
-                for (int i = 0; i < ccs.length; ++i) {
-                    final ControlCenter cc = ccs[i];
+                for (final ControlCenter cc : ccs) {
                     try {
                         cc.updateSensors();
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), "Error when retreiving sensor info@!", Toast.LENGTH_SHORT);
+                    } catch (final Exception e) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        getResources().getText(R.string.toast_error_loading_sensors)
+                                                + e.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         continue;
                     }
                     handler.post(new Runnable() { // Code to run in main UI
