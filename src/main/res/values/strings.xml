@@ -20,5 +20,11 @@
     <string name="current_value">Current Value:</string>
     <string name="toast_error_loading_sensors">Error loading sensors!</string>
     <string name="def_device_id">Device ID</string>
+    <string name="menu_set_trigger">Set Trigger</string>
+    <string name="menu_rename">Rename</string>
+    <string name="menu_view_history">View History</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_remove">Remove</string>
+    <string name="text_loading">Refreshing...</string>
 
 </resources>

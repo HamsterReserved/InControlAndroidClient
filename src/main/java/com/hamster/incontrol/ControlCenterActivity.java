@@ -58,7 +58,6 @@ public class ControlCenterActivity extends TintedStatusBarActivity {
         DeviceDetailViewAdapter lv_adapter = (DeviceDetailViewAdapter)
                 ((ListView) findViewById(R.id.manage_device_list)).getAdapter();
         LocalConfigStore lcs = new LocalConfigStore(this.getApplicationContext());
-        lcs.open();
         lv_adapter.clearAll();
         lv_adapter.addToControlCenters(lcs.getControlCenters());
         lcs.close();
@@ -92,7 +91,6 @@ public class ControlCenterActivity extends TintedStatusBarActivity {
                 cc.setCredentials(et_cc_cred.getText().toString());
 
                 LocalConfigStore lcs = new LocalConfigStore(mContext);
-                lcs.open();
 
                 if (cc.isInfoComplete()) lcs.updateDevice(cc, ControlCenter.INVALID_DEVICE_ID);
 

@@ -22,12 +22,21 @@ public class MainActivity extends TintedStatusBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        LocalConfigStore lcs = new LocalConfigStore(getApplicationContext());
+        boolean isNoDevice = lcs.getControlCenters().length == 0;
+        lcs.close();
+        // TODO 显示缓存的传感器数据
+
         ListView lv = (ListView) findViewById(R.id.device_list);
         lv.setAdapter(new DeviceListViewAdapter(getApplicationContext()));
 
         TextView empty_tv = new TextView(this.getApplicationContext());
         ((ViewGroup) lv.getParent()).addView(empty_tv); // This is the key to get setEmptyView working.
-        empty_tv.setText(R.string.text_empty_centers);
+        if (isNoDevice) {
+            empty_tv.setText(R.string.text_empty_centers);
+        } else {
+            empty_tv.setText(R.string.text_loading);
+        }
         empty_tv.setLayoutParams(
                 new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT)); // Auto-select FrameLayout
@@ -68,7 +77,6 @@ public class MainActivity extends TintedStatusBarActivity {
     private void refreshSensorList() {
         final DeviceListViewAdapter la = (DeviceListViewAdapter) ((ListView) findViewById(R.id.device_list)).getAdapter();
         LocalConfigStore lcs = new LocalConfigStore(this.getApplicationContext());
-        lcs.open();
         final ControlCenter[] ccs = lcs.getControlCenters(); // This is local only
         lcs.close();
 

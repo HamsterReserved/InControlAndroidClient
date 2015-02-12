@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_sensor_set_trigger"
+        android:title="@string/menu_set_trigger" />
+
+    <item
+        android:id="@+id/action_sensor_rename"
+        android:title="@string/menu_rename" />
+
+    <item
+        android:id="@+id/action_sensor_view_history"
+        android:title="@string/menu_view_history" />
+</menu>

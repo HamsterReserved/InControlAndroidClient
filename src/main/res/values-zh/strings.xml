@@ -18,4 +18,10 @@
     <string name="current_value">当前值：</string>
     <string name="toast_error_loading_sensors">传感器数据加载出错！</string>
     <string name="def_device_id">设备ID</string>
+    <string name="menu_edit">编辑</string>
+    <string name="menu_remove">删除</string>
+    <string name="menu_rename">重命名</string>
+    <string name="menu_set_trigger">设置触发器</string>
+    <string name="menu_view_history">查看历史</string>
+    <string name="text_loading">正在刷新……</string>
 </resources>

@@ -42,10 +42,11 @@ public class LocalConfigStore {
     LocalConfigStore(Context context) {
         this.mContext = context;
         dbhelper = new DatabaseHelper(this.mContext);
+        this.open();
     }
 
     void open() {
-        db = dbhelper.getWritableDatabase();
+        if (db == null) db = dbhelper.getWritableDatabase();
         Log.v(LOG_TAG, "open() is called.");
     }
 

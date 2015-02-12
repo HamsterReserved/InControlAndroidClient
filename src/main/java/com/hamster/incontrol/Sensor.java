@@ -150,7 +150,6 @@ public class Sensor {
     }
 
     /**
-     * @deprecated 请对每一个ControlCenter使用其updateSensors，不必单独更新每个Sensor
      * @param na 已初始化有HomeDevice的NetworkAccessor实例
      * @throws IOException   网络错误
      * @throws JSONException JSON格式错误
@@ -172,7 +171,6 @@ public class Sensor {
 
     public void saveToDatabase() {
         LocalConfigStore lcs = new LocalConfigStore(this.mContext);
-        lcs.open();
         lcs.updateSensor(this, Sensor.INVALID_SENSOR_ID);
         lcs.close();
     }
