@@ -5,7 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,6 +20,17 @@ public class DeviceListViewAdapter extends BaseAdapter {
     private Context mContext = null;
     private LayoutInflater mInflater = null;
     private ArrayList<Sensor> mSensors;
+
+    private View.OnClickListener menuOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (v.getId() == R.id.sensor_popup_menu) {
+                PopupMenu pop = new PopupMenu(mContext, v);
+                pop.getMenuInflater().inflate(R.menu.menu_sensor_overflow, pop.getMenu());
+                pop.show();
+            }
+        }
+    };
 
     DeviceListViewAdapter(Context context) {
         if (context != null)
@@ -61,6 +74,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
         TextView status_message = (TextView) convertView.findViewById(R.id.status_message);
         TextView update_time = (TextView) convertView.findViewById(R.id.update_time);
         ImageView image = (ImageView) convertView.findViewById(R.id.sensor_pic);
+        ImageButton ib = (ImageButton) convertView.findViewById(R.id.sensor_popup_menu);
 
         Sensor this_sensor = mSensors.get(position);
         sensor_name.setText(this_sensor.getSensorName());
@@ -69,6 +83,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
                 + this_sensor.getSensorCachedValue());
         update_time.setText(TimeStamp2Date(this_sensor.getLastUpdateDate()));
         //image.setPic(this_sens.getType)
+        ib.setOnClickListener(menuOnClickListener);
 
         return convertView;
     }

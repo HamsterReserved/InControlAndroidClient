@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,6 +20,17 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
     private Context mContext = null;
     private LayoutInflater mInflater = null;
     private ArrayList<ControlCenter> mCenters;
+
+    private View.OnClickListener menuOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (v.getId() == R.id.device_popup_menu) {
+                PopupMenu pop = new PopupMenu(v.getContext(), v);
+                pop.getMenuInflater().inflate(R.menu.menu_control_center_overflow, pop.getMenu());
+                pop.show();
+            }
+        }
+    };
 
     DeviceDetailViewAdapter(Context context) {
         if (context != null)
@@ -55,9 +68,11 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.control_center_detail, null);
         TextView cc_name = (TextView) convertView.findViewById(R.id.tv_control_center_name);
         TextView cc_id = (TextView) convertView.findViewById(R.id.tv_control_center_id);
+        ImageButton ib = (ImageButton) convertView.findViewById(R.id.device_popup_menu);
 
         cc_name.setText(mCenters.get(position).getDeviceName());
         cc_id.setText(String.valueOf(mCenters.get(position).getDeviceId())); // setText(int) is for resources
+        ib.setOnClickListener(menuOnClickListener);
 
         return convertView;
     }

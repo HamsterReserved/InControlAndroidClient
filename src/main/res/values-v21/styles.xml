@@ -3,11 +3,10 @@
 
     <style name="AppBaseTheme" parent="android:Theme.Material.Light.DarkActionBar">
         <item name="android:colorPrimaryDark">#6161B1</item>
-        <item name="android:statusBarColor">#8C8CFF</item>
         <item name="android:colorPrimary">#8C8CFF</item>
     </style>
 
     <style name="AppTheme" parent="AppBaseTheme">
-
+        <item name="android:popupMenuStyle">@android:style/Widget.Holo.Light.ListPopupWindow</item>
     </style>
 </resources>
