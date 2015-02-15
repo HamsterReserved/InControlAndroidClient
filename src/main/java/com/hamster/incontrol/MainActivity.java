@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         LocalConfigStore lcs = new LocalConfigStore(getApplicationContext());
-        boolean isNoDevice = lcs.getControlCenters().length == 0;
+        boolean isNoDevice = lcs.getControlCenters() == null;
         lcs.close();
         // TODO 显示缓存的传感器数据
 

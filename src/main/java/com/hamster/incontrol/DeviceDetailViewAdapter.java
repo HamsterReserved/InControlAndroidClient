@@ -1,7 +1,10 @@
 package com.hamster.incontrol;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -21,14 +24,49 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
     private LayoutInflater mInflater = null;
     private ArrayList<ControlCenter> mCenters;
 
+    private Handler handler = new Handler();
+
     private View.OnClickListener menuOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.device_popup_menu) {
                 PopupMenu pop = new PopupMenu(v.getContext(), v);
+                Intent intentDummy = new Intent();
+                intentDummy.putExtra("id", ((TextView) ((View) v.getParent()).findViewById(R.id.tv_control_center_id)).getText().toString());
                 pop.getMenuInflater().inflate(R.menu.menu_control_center_overflow, pop.getMenu());
+                pop.getMenu().getItem(0).setOnMenuItemClickListener(menuEditOnClickListener);
+                pop.getMenu().getItem(0).setIntent(intentDummy);
+                pop.getMenu().getItem(1).setOnMenuItemClickListener(menuDeleteOnClickListener);
+                pop.getMenu().getItem(1).setIntent(intentDummy);
                 pop.show();
             }
+        }
+    };
+
+    private MenuItem.OnMenuItemClickListener menuDeleteOnClickListener = new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            LocalConfigStore lcs = new LocalConfigStore(mContext);
+            lcs.removeDevice(Integer.parseInt(item.getIntent().getStringExtra("id")));
+            lcs.close();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    clearAll();
+                    LocalConfigStore lcs_m = new LocalConfigStore(mContext);
+                    addToControlCenters(lcs_m.getControlCenters());
+                    lcs_m.close();
+                }
+            });
+            return true;
+        }
+    };
+
+    private MenuItem.OnMenuItemClickListener menuEditOnClickListener = new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+
+            return true;
         }
     };
 

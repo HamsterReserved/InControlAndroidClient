@@ -245,6 +245,16 @@ public class LocalConfigStore {
         return sensors;
     }
 
+    /**
+     * 删除一个设备
+     *
+     * @param device_id 要删除的ID
+     * @return true成功 false失败
+     */
+    public int removeDevice(int device_id) {
+        return db.delete(MYDEVICE_TABLE_NAME, "device_id = ?", new String[]{String.valueOf(device_id)});
+    }
+
     private class DatabaseHelper extends SQLiteOpenHelper {
         private String CREATE_TABLE_MYDEVICE = "CREATE TABLE mydevice(" +
                 "device_id integer," +
