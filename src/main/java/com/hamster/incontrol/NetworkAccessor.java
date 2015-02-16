@@ -31,17 +31,43 @@ public class NetworkAccessor {
     public static final String INCONTROL_API_URL = "http://192.168.137.1/incontrol/incontrol/incontrol_api.php";
 
     /**
-     * 查询所有传感器
-     */
-    public static int REQUEST_TYPE_QUERY_SENSORS = 1;
-    /**
-     * 查询某一传感器的具体值
-     */
-    public static int REQUEST_TYPE_QUERY_SENSOR_INFO = 2;
-    /**
      * 设备类型，这个数值应与PHP保持一致，不能修改
      */
-    private static int DEVICE_TYPE = 2;
+    private static final int DEVICE_TYPE = 2;
+
+    /**
+     * 查询所有传感器
+     */
+    public static final int REQUEST_TYPE_QUERY_SENSORS_LIST = 1;
+    /**
+     * @deprecated PHP已经去除此选项，将导致错误
+     * 查询某一传感器的具体值
+     */
+    public static final int REQUEST_TYPE_QUERY_SENSOR_INFO = 2;
+    /**
+     * 查询传感器数据历史（结果可以用Map存放）
+     */
+    public static final int REQUEST_TYPE_QUERY_SENSOR_HISTORY = 3;
+    /**
+     * 查询设备信息（已有的名称啥的）
+     */
+    public static final int REQUEST_TYPE_QUERY_DEVICE_INFO = 4;
+    /**
+     * 设置类参数的起始值
+     */
+    public static final int REQUEST_TYPE_SET_BASE = 100;
+    /**
+     * 设置控制中心名
+     */
+    public static final int REQUEST_TYPE_SET_DEVICE_NAME = REQUEST_TYPE_SET_BASE + 1;
+    /**
+     * 设置传感器的触发器（字符串）需要base64
+     */
+    public static final int REQUEST_TYPE_SET_SENSOR_TRIGGER = REQUEST_TYPE_SET_BASE + 2;
+    /**
+     * 设置传感器名
+     */
+    public static final int REQUEST_TYPE_SET_SENSOR_NAME = REQUEST_TYPE_SET_BASE + 3;
 
     public static final String JSON_SENSOR_ID_KEY = "sensor_id";
     public static final String JSON_SENSOR_NAME_KEY = "sensor_name";
@@ -101,7 +127,7 @@ public class NetworkAccessor {
         Map<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("device_id", String.valueOf(device.getDeviceId()));
         paramMap.put("device_type", String.valueOf(DEVICE_TYPE));
-        paramMap.put("request_type", String.valueOf(REQUEST_TYPE_QUERY_SENSORS));
+        paramMap.put("request_type", String.valueOf(REQUEST_TYPE_QUERY_SENSORS_LIST));
 
         HttpGet httpGet = new HttpGet(buildUrlWithParams(paramMap));
         HttpClient httpClient = new DefaultHttpClient();
