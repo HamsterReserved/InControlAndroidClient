@@ -97,4 +97,18 @@ public class DeviceListViewAdapter extends BaseAdapter {
         mSensors.clear();
         if (isShownImmediately) this.notifyDataSetChanged();
     }
+
+    /**
+     * 与notifyDataSetChanged相同，就是多了一个手动设置emptyView显示与隐藏的功能
+     * 用来解决setEmptyView后列表为空时SwipeRefresh手势动画不出现的问题
+     *
+     * @param v 要显示的emptyView，不要用setEmptyView
+     */
+    public void reloadDataWithEmptyView(View v) {
+        this.notifyDataSetChanged();
+        if (this.getCount() == 0)
+            v.setVisibility(View.VISIBLE);
+        else
+            v.setVisibility(View.GONE);
+    }
 }

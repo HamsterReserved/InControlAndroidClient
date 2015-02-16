@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ public class MainActivity extends Activity {
     private Handler mHandler = new Handler();
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private DeviceListViewAdapter mListAdapter;
+    private View mEmptyView;
     private static final String TAG = "InControl_MainActivity";
 
     @Override
@@ -46,15 +48,18 @@ public class MainActivity extends Activity {
         boolean isNoDevice = lcs.getControlCenters() == null;
         lcs.close();
 
-        TextView empty_tv = (TextView) ((FrameLayout) mSwipeRefreshLayout.getParent()).findViewById(R.id.tv_empty_device_list);
+        mEmptyView = ((FrameLayout) mSwipeRefreshLayout.getParent())
+                .findViewById(R.id.tv_empty_device_list);
         if (isNoDevice) {
-            empty_tv.setText(R.string.text_empty_centers);
+            ((TextView) mEmptyView).setText(R.string.text_empty_centers);
         } else {
-            empty_tv.setText(R.string.text_loading);
+            ((TextView) mEmptyView).setText(R.string.text_loading);
         }
-        lv.setEmptyView(empty_tv); //This will cause Swipe icon to disappear if empty
+        // lv.setEmptyView(mEmptyView);
+        // This will cause Swipe indicator to disappear if list is empty
 
         loadCachedSensors(); // 显示缓存的传感器数据
+        mSwipeRefreshLayout.setRefreshing(true);
         refreshSensorList(); // 从网络获取传感器数据
     }
 
@@ -91,8 +96,6 @@ public class MainActivity extends Activity {
     }
 
     private void loadCachedSensors() {
-        final DeviceListViewAdapter la = (DeviceListViewAdapter)
-                ((ListView) mSwipeRefreshLayout.findViewById(R.id.device_list)).getAdapter();
         LocalConfigStore lcs = new LocalConfigStore(this.getApplicationContext());
         final ControlCenter[] ccs = lcs.getControlCenters(); // This is local only
 
@@ -101,11 +104,11 @@ public class MainActivity extends Activity {
             return;
         }
 
-        la.clearAll(false);
+        mListAdapter.clearAll(false);
         for (final ControlCenter cc : ccs) {
-            la.addToSensors(lcs.getSensors(cc));
+            mListAdapter.addToSensors(lcs.getSensors(cc));
         }
-        la.notifyDataSetChanged();
+        mListAdapter.reloadDataWithEmptyView(mEmptyView);
     }
 
     private void onRefreshComplete(Sensor[] snrs) {
@@ -115,7 +118,7 @@ public class MainActivity extends Activity {
         if (snrs != null) { // Do not erase loaded cache sensors if no new ones
             mListAdapter.clearAll(true);
             mListAdapter.addToSensors(snrs);
-            mListAdapter.notifyDataSetChanged();
+            mListAdapter.reloadDataWithEmptyView(mEmptyView);
         }
 
         // Stop the refreshing indicator
