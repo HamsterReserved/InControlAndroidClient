@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
     private Handler mHandler = new Handler();
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private DeviceListViewAdapter mListAdapter;
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "InControl_MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +32,8 @@ public class MainActivity extends Activity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Log.i(LOG_TAG, "onRefresh called from SwipeRefreshLayout");
+                Log.i(TAG, "onRefresh called from SwipeRefreshLayout");
 
-                //initiateRefresh();
                 refreshSensorList();
             }
         });
@@ -73,7 +72,6 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            //List_adapter.addItem();
             mSwipeRefreshLayout.setRefreshing(true);
             refreshSensorList();
             return true;
@@ -87,16 +85,14 @@ public class MainActivity extends Activity {
     }
 
     private void refreshSensorList() {
-        //Log.i(LOG_TAG, "initiateRefresh");
+        Log.v(TAG, "refreshSensorList called");
 
-        /**
-         * Execute the background task, which uses {@link android.os.AsyncTask} to load the data.
-         */
         new RefreshDataBackgroundTask().execute();
     }
 
     private void loadCachedSensors() {
-        final DeviceListViewAdapter la = (DeviceListViewAdapter) ((ListView) mSwipeRefreshLayout.findViewById(R.id.device_list)).getAdapter();
+        final DeviceListViewAdapter la = (DeviceListViewAdapter)
+                ((ListView) mSwipeRefreshLayout.findViewById(R.id.device_list)).getAdapter();
         LocalConfigStore lcs = new LocalConfigStore(this.getApplicationContext());
         final ControlCenter[] ccs = lcs.getControlCenters(); // This is local only
 
@@ -113,7 +109,7 @@ public class MainActivity extends Activity {
     }
 
     private void onRefreshComplete(Sensor[] snrs) {
-        // Log.i(LOG_TAG, "onRefreshComplete");
+        Log.v(TAG, "onRefreshComplete");
 
         // Remove all items from the ListAdapter, and then replace them with the new items
         if (snrs != null) { // Do not erase loaded cache sensors if no new ones

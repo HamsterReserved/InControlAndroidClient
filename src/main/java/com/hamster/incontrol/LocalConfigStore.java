@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * 配置中心，也可以读写数据库
@@ -47,14 +46,12 @@ public class LocalConfigStore {
 
     void open() {
         if (db == null) db = dbhelper.getWritableDatabase();
-        Log.v(LOG_TAG, "open() is called.");
     }
 
     public void close() {
         db.close();
         db = null;
         dbhelper.close();
-        Log.v(LOG_TAG, "close() is called.");
     }
 
     /**
