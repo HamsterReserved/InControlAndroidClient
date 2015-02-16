@@ -91,6 +91,7 @@ public class ControlCenter {
             sensors[i].setSensorName(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_NAME_KEY));
             sensors[i].setSensorCachedValue(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_VALUE_KEY));
             sensors[i].setLastUpdateDate(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_DATE_KEY));
+            sensors[i].saveToDatabase();
         }
     }
 }

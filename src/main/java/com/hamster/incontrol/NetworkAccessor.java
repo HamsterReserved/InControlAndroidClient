@@ -27,7 +27,8 @@ public class NetworkAccessor {
     /**
      * API地址
      */
-    public static final String INCONTROL_API_URL = "http://incontrol.sinaapp.com/incontrol_api.php";
+    //public static final String INCONTROL_API_URL = "http://incontrol.sinaapp.com/incontrol_api.php";
+    public static final String INCONTROL_API_URL = "http://192.168.137.1/incontrol/incontrol/incontrol_api.php";
 
     /**
      * 查询所有传感器
@@ -45,7 +46,7 @@ public class NetworkAccessor {
     public static final String JSON_SENSOR_ID_KEY = "sensor_id";
     public static final String JSON_SENSOR_NAME_KEY = "sensor_name";
     public static final String JSON_SENSOR_TYPE_KEY = "sensor_type";
-    public static final String JSON_SENSOR_VALUE_KEY = "sensor_info";
+    public static final String JSON_SENSOR_VALUE_KEY = "sensor_value";
     public static final String JSON_SENSOR_DATE_KEY = "sensor_date";
 
     /**
@@ -112,10 +113,10 @@ public class NetworkAccessor {
             JSONArray jsonArray = new JSONArray(retStr);
             return jsonArray;
         } else if (httpResponse.getStatusLine().getStatusCode() == 501) { // "Not implemented"
-            throw new IOException("URL Parameters Error! Detail: "
+            throw new IOException("参数错误，请检查是否存在错误的设备ID！ Detail: "
                     + EntityUtils.toString(httpResponse.getEntity()));
         } else {
-            throw new IOException("HTTP Return Code unknown: "
+            throw new IOException("HTTP返回码未知: "
                     + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
         }
     }

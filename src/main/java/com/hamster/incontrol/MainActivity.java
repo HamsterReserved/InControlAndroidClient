@@ -2,51 +2,61 @@ package com.hamster.incontrol;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Gravity;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class MainActivity extends Activity {
 
-    private Handler handler = new Handler();
+    private Handler mHandler = new Handler();
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private DeviceListViewAdapter mListAdapter;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Log.i(LOG_TAG, "onRefresh called from SwipeRefreshLayout");
+
+                //initiateRefresh();
+                refreshSensorList();
+            }
+        });
+
+        ListView lv = (ListView) mSwipeRefreshLayout.findViewById(R.id.device_list);
+        mListAdapter = new DeviceListViewAdapter(getApplicationContext());
+        lv.setAdapter(mListAdapter);
+
         LocalConfigStore lcs = new LocalConfigStore(getApplicationContext());
         boolean isNoDevice = lcs.getControlCenters() == null;
         lcs.close();
-        // TODO 显示缓存的传感器数据
 
-        ListView lv = (ListView) findViewById(R.id.device_list);
-        lv.setAdapter(new DeviceListViewAdapter(getApplicationContext()));
-
-        TextView empty_tv = new TextView(this.getApplicationContext());
-        ((ViewGroup) lv.getParent()).addView(empty_tv); // This is the key to get setEmptyView working.
+        TextView empty_tv = (TextView) ((FrameLayout) mSwipeRefreshLayout.getParent()).findViewById(R.id.tv_empty_device_list);
         if (isNoDevice) {
             empty_tv.setText(R.string.text_empty_centers);
         } else {
             empty_tv.setText(R.string.text_loading);
         }
-        empty_tv.setLayoutParams(
-                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT)); // Auto-select FrameLayout
-        empty_tv.setGravity(Gravity.CENTER);
-        empty_tv.setTextColor(Color.GRAY);
-        empty_tv.setTextSize(getResources().getDimension(R.dimen.text_size_empty_centers));
-        lv.setEmptyView(empty_tv);
+        lv.setEmptyView(empty_tv); //This will cause Swipe icon to disappear if empty
 
-        refreshSensorList();
+        loadCachedSensors(); // 显示缓存的传感器数据
+        refreshSensorList(); // 从网络获取传感器数据
     }
 
     @Override
@@ -64,6 +74,7 @@ public class MainActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             //List_adapter.addItem();
+            mSwipeRefreshLayout.setRefreshing(true);
             refreshSensorList();
             return true;
         } else if (id == R.id.action_settings) {
@@ -76,42 +87,88 @@ public class MainActivity extends Activity {
     }
 
     private void refreshSensorList() {
-        final DeviceListViewAdapter la = (DeviceListViewAdapter) ((ListView) findViewById(R.id.device_list)).getAdapter();
+        //Log.i(LOG_TAG, "initiateRefresh");
+
+        /**
+         * Execute the background task, which uses {@link android.os.AsyncTask} to load the data.
+         */
+        new RefreshDataBackgroundTask().execute();
+    }
+
+    private void loadCachedSensors() {
+        final DeviceListViewAdapter la = (DeviceListViewAdapter) ((ListView) mSwipeRefreshLayout.findViewById(R.id.device_list)).getAdapter();
         LocalConfigStore lcs = new LocalConfigStore(this.getApplicationContext());
         final ControlCenter[] ccs = lcs.getControlCenters(); // This is local only
-        lcs.close();
 
-        if (ccs == null) return;
-        new Thread() {
-            @Override
-            public void run() { // Code to run in thread
-                // TODO Auto-generated method stub
-                super.run();
-                for (final ControlCenter cc : ccs) {
-                    try {
-                        cc.updateSensors();
-                    } catch (final Exception e) {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(),
-                                        getResources().getText(R.string.toast_error_loading_sensors)
-                                                + e.getMessage(),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        continue;
-                    }
-                    handler.post(new Runnable() { // Code to run in main UI
+        if (ccs == null) {
+            lcs.close();
+            return;
+        }
+
+        la.clearAll(false);
+        for (final ControlCenter cc : ccs) {
+            la.addToSensors(lcs.getSensors(cc));
+        }
+        la.notifyDataSetChanged();
+    }
+
+    private void onRefreshComplete(Sensor[] snrs) {
+        // Log.i(LOG_TAG, "onRefreshComplete");
+
+        // Remove all items from the ListAdapter, and then replace them with the new items
+        if (snrs != null) { // Do not erase loaded cache sensors if no new ones
+            mListAdapter.clearAll(true);
+            mListAdapter.addToSensors(snrs);
+            mListAdapter.notifyDataSetChanged();
+        }
+
+        // Stop the refreshing indicator
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private class RefreshDataBackgroundTask extends AsyncTask<Void, Void, Sensor[]> {
+
+        @Override
+        protected Sensor[] doInBackground(Void... params) {
+            ArrayList<Sensor> snr_list = new ArrayList<Sensor>();
+            LocalConfigStore lcs = new LocalConfigStore(getApplicationContext());
+            final ControlCenter[] ccs = lcs.getControlCenters(); // This is local only
+
+            if (ccs == null) return null;
+            for (ControlCenter cc : ccs) {
+                try {
+                    cc.updateSensors();
+                } catch (final Exception e) {
+                    Log.e(TAG, "updateSensors encountered error! Msg:" + e.getLocalizedMessage());
+                    mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            la.clearAll();
-                            la.addToSensors(cc.getSensors());
-                            la.notifyDataSetChanged();
+                            Toast.makeText(getApplicationContext(),
+                                    e.getLocalizedMessage(), // TODO this is hardcoded in NetworkAccessor in Chinese
+                                    Toast.LENGTH_SHORT).show();
+                            loadCachedSensors();
                         }
                     });
+                    return null; // We don't want incomplete data to go through. Just show cached.
+                }
+                for (Sensor snr : cc.getSensors()) {
+                    snr_list.add(snr);
                 }
             }
-        }.start();
+
+            // Sensor ret_snr[] = snr_list.toArray()
+            Sensor ret_snr[] = new Sensor[snr_list.size()];
+            for (int i = 0; i < snr_list.size(); i++)
+                ret_snr[i] = snr_list.get(i);
+            return ret_snr;
+        }
+
+        @Override
+        protected void onPostExecute(Sensor[] result) {
+            super.onPostExecute(result);
+
+            onRefreshComplete(result);
+        }
+
     }
 }

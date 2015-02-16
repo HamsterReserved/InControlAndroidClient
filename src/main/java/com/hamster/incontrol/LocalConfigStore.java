@@ -88,7 +88,7 @@ public class LocalConfigStore {
      * @return 如果add_new是1，则返回新行ID，否则0失败其他成功
      */
     public long updateSensorId(boolean add_new, int sensor_id, int org_sensor_id) {
-        if (sensor_id == org_sensor_id) return 0;
+        if (!add_new && sensor_id == org_sensor_id) return 0;
 
         ContentValues cv = new ContentValues();
 
@@ -241,7 +241,10 @@ public class LocalConfigStore {
             sensors[i].setSensorType(Sensor.convertIntToType(cursor.getInt(2)));
             sensors[i].setLastUpdateDate(cursor.getInt(3));
             sensors[i].setSensorCachedValue(cursor.getString(4));
+            cursor.moveToNext();
+            i++;
         }
+        cursor.close();
         return sensors;
     }
 
@@ -252,7 +255,10 @@ public class LocalConfigStore {
      * @return true成功 false失败
      */
     public int removeDevice(int device_id) {
-        return db.delete(MYDEVICE_TABLE_NAME, "device_id = ?", new String[]{String.valueOf(device_id)});
+        int result = 0;
+        result |= db.delete(MYDEVICE_TABLE_NAME, "device_id = ?", new String[]{String.valueOf(device_id)});
+        result |= db.delete(SENSORS_TABLE_NAME, "sensor_parent_control_id = ?", new String[]{String.valueOf(device_id)});
+        return result;
     }
 
     private class DatabaseHelper extends SQLiteOpenHelper {

@@ -77,6 +77,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
         ImageButton ib = (ImageButton) convertView.findViewById(R.id.sensor_popup_menu);
 
         Sensor this_sensor = mSensors.get(position);
+        if (this_sensor == null) return null; // TODO: WTF? Why is this happening?
         sensor_name.setText(this_sensor.getSensorName());
         device_name.setText("@" + this_sensor.getParentControlCenter().getDeviceName());
         status_message.setText(mContext.getResources().getText(R.string.current_value)
@@ -92,8 +93,8 @@ public class DeviceListViewAdapter extends BaseAdapter {
         return new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(timestamp * 1000));
     }
 
-    public void clearAll() {
+    public void clearAll(boolean isShownImmediately) {
         mSensors.clear();
-        this.notifyDataSetChanged();
+        if (isShownImmediately) this.notifyDataSetChanged();
     }
 }

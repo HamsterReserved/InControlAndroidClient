@@ -31,6 +31,7 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
         public void onClick(View v) {
             if (v.getId() == R.id.device_popup_menu) {
                 PopupMenu pop = new PopupMenu(v.getContext(), v);
+                // TODO: This is a dirty way to pass info to menuitem. Fix it if possible.
                 Intent intentDummy = new Intent();
                 intentDummy.putExtra("id", ((TextView) ((View) v.getParent()).findViewById(R.id.tv_control_center_id)).getText().toString());
                 pop.getMenuInflater().inflate(R.menu.menu_control_center_overflow, pop.getMenu());
@@ -45,15 +46,13 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
 
     private MenuItem.OnMenuItemClickListener menuDeleteOnClickListener = new MenuItem.OnMenuItemClickListener() {
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            LocalConfigStore lcs = new LocalConfigStore(mContext);
-            lcs.removeDevice(Integer.parseInt(item.getIntent().getStringExtra("id")));
-            lcs.close();
+        public boolean onMenuItemClick(final MenuItem item) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     clearAll();
                     LocalConfigStore lcs_m = new LocalConfigStore(mContext);
+                    lcs_m.removeDevice(Integer.parseInt(item.getIntent().getStringExtra("id")));
                     addToControlCenters(lcs_m.getControlCenters());
                     lcs_m.close();
                 }
