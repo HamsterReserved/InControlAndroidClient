@@ -15,7 +15,7 @@
     <string name="text_hint_controller_name">Custom Controller Name</string>
     <string name="text_hint_user_credentials">Credentials shown on screen</string>
     <string name="button_cancel">Cancel</string>
-    <string name="dialog_title_add_new_center">Add a new InControl Controller</string>
+    <string name="dialog_title_add_new_center">Add a new Controller</string>
     <string name="button_ok">OK</string>
     <string name="current_value">Current Value:</string>
     <string name="toast_error_loading_sensors">Error loading sensors!</string>
@@ -26,5 +26,6 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_remove">Remove</string>
     <string name="text_loading">Refreshing...</string>
+    <string name="dialog_title_edit_controller">Edit Controller</string>
 
 </resources>

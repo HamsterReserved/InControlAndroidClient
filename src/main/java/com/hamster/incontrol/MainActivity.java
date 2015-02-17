@@ -44,20 +44,6 @@ public class MainActivity extends Activity {
         ListView lv = (ListView) mSwipeRefreshLayout.findViewById(R.id.device_list);
         mListAdapter = new DeviceListViewAdapter(getApplicationContext());
         lv.setAdapter(mListAdapter);
-
-        LocalConfigStore lcs = new LocalConfigStore(getApplicationContext());
-        boolean isNoDevice = lcs.getControlCenters() == null;
-        lcs.close();
-
-        mEmptyView = ((FrameLayout) mSwipeRefreshLayout.getParent())
-                .findViewById(R.id.tv_empty_device_list);
-        if (isNoDevice) {
-            ((TextView) mEmptyView).setText(R.string.text_empty_centers);
-        } else {
-            ((TextView) mEmptyView).setText(R.string.text_loading);
-        }
-        // lv.setEmptyView(mEmptyView);
-        // This will cause Swipe indicator to disappear if list is empty
     }
 
     @Override
@@ -100,6 +86,22 @@ public class MainActivity extends Activity {
         super.onResume();
 
         // SDK Documentation suggest loading data here. At least not in onCreate
+
+        // Update TextView
+        LocalConfigStore lcs = new LocalConfigStore(getApplicationContext());
+        boolean isNoDevice = lcs.getControlCenters() == null;
+        lcs.close();
+
+        mEmptyView = ((FrameLayout) mSwipeRefreshLayout.getParent())
+                .findViewById(R.id.tv_empty_device_list);
+        if (isNoDevice) {
+            ((TextView) mEmptyView).setText(R.string.text_empty_centers);
+        } else {
+            ((TextView) mEmptyView).setText(R.string.text_loading);
+        }
+        // lv.setEmptyView(mEmptyView);
+        // This will cause Swipe indicator to disappear if list is empty
+
         loadCachedSensors(); // 显示缓存的传感器数据
         isFirstLaunch = true;
     }

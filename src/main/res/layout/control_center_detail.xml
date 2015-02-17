@@ -18,10 +18,20 @@
         android:textSize="22sp" />
 
     <TextView
+        android:id="@+id/tv_id_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_control_center_name"
+        android:text="ID: "
+        android:textColor="@android:color/tertiary_text_dark"
+        android:textSize="@dimen/text_size_secondary_text" />
+
+    <TextView
         android:id="@+id/tv_control_center_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_control_center_name"
+        android:layout_alignBaseline="@id/tv_id_prompt"
+        android:layout_toRightOf="@id/tv_id_prompt"
         android:text="@string/def_device_id"
         android:textColor="@android:color/tertiary_text_dark"
         android:textSize="@dimen/text_size_secondary_text" />

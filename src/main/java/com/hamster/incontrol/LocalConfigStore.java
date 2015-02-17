@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * 配置中心，也可以读写数据库
@@ -107,6 +108,7 @@ public class LocalConfigStore {
      * @return 0失败其他成功
      */
     public boolean updateDevice(ControlCenter new_device, int change_to_id) {
+        Log.v(LOG_TAG, "updateDevice enter");
         int device_id = new_device.getDeviceId();
         int result = 0;
 
@@ -132,6 +134,7 @@ public class LocalConfigStore {
         result |= db.update(MYDEVICE_TABLE_NAME, cv,
                 DEVICE_ID_KEY + " = ?",
                 new String[]{String.valueOf(change_to_id)});
+        Log.v(LOG_TAG, "updateDevice return");
         return result != 0;
     }
 

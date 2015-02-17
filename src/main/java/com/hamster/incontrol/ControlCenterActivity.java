@@ -17,7 +17,7 @@ import android.widget.ListView;
 
 public class ControlCenterActivity extends Activity {
 
-    private Handler hnd = new Handler();
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +25,7 @@ public class ControlCenterActivity extends Activity {
         setContentView(R.layout.activity_control_center);
 
         ListView lv = (ListView) findViewById(R.id.manage_device_list);
-        DeviceDetailViewAdapter lv_adapter = new DeviceDetailViewAdapter(this.getApplicationContext());
+        DeviceDetailViewAdapter lv_adapter = new DeviceDetailViewAdapter(this);
         lv.setAdapter(lv_adapter);
 
         loadControllers();
@@ -48,7 +48,7 @@ public class ControlCenterActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_control_center_add) {
-            showEditDialog();
+            showAddDialog();
             return true;
         }
 
@@ -64,7 +64,7 @@ public class ControlCenterActivity extends Activity {
         lcs.close();
     }
 
-    private void showEditDialog() { // TODO Currently only supports adding a new one
+    private void showAddDialog() {
         // Copied from net
         Resources res = getResources();
         AlertDialog.Builder builder;
@@ -88,6 +88,7 @@ public class ControlCenterActivity extends Activity {
 
                 ControlCenter cc = new ControlCenter(getApplicationContext());
                 cc.setDeviceId(Integer.parseInt(et_cc_id.getText().toString()));
+                // -1 if null, which is exactly INVAILD_SENSOR_ID
                 cc.setDeviceName(et_cc_name.getText().toString());
                 cc.setCredentials(et_cc_cred.getText().toString());
 
@@ -97,7 +98,7 @@ public class ControlCenterActivity extends Activity {
 
                 lcs.close();
 
-                hnd.post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         loadControllers();
