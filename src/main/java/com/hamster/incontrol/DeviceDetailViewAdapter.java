@@ -107,7 +107,8 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
         ImageButton ib = (ImageButton) convertView.findViewById(R.id.device_popup_menu);
 
         cc_name.setText(mCenters.get(position).getDeviceName());
-        cc_id.setText(String.valueOf(mCenters.get(position).getDeviceId())); // setText(int) is for resources
+        cc_id.setText("ID: " +
+                String.valueOf(mCenters.get(position).getDeviceId())); // setText(int) is for resources
         ib.setOnClickListener(menuOnClickListener);
 
         return convertView;

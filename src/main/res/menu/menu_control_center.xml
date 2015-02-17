@@ -3,7 +3,7 @@
     tools:context="com.hamster.incontrol.ControlCenterActivity">
     <item
         android:id="@+id/action_control_center_add"
-        android:title="@string/action_control_center_add"
+        android:icon="@drawable/ic_menu_add"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/ic_menu_add" />
+        android:title="@string/action_control_center_add" />
 </menu>

@@ -2,36 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:background="@android:color/transparent"
+    android:padding="8dp">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/def_device_name"
-        android:textSize="22sp"
-        android:textColor="@android:color/black"
         android:id="@+id/tv_control_center_name"
-        android:layout_marginBottom="10dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/def_device_id"
-        android:textSize="18sp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dp"
+        android:text="@string/def_device_name"
         android:textColor="@android:color/black"
+        android:textSize="22sp" />
+
+    <TextView
         android:id="@+id/tv_control_center_id"
-        android:layout_below="@+id/tv_control_center_name" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_control_center_name"
+        android:text="@string/def_device_id"
+        android:textColor="@android:color/tertiary_text_dark"
+        android:textSize="@dimen/text_size_secondary_text" />
 
     <ImageButton
+        android:id="@+id/device_popup_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/device_popup_menu"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
         android:background="@android:color/transparent"
         android:src="@drawable/overflow_card"
         android:tint="@android:color/tertiary_text_dark" />
