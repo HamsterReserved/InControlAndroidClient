@@ -76,11 +76,10 @@ public class NetworkAccessor {
     public static final String JSON_SENSOR_DATE_KEY = "sensor_date";
 
     /**
-     * @deprecated PHP端已改为直接返回带数据的列表
-     * 更新指定传感器的值
-     *
      * @param sensor_id 传感器ID
      * @return 此传感器数据的JSON对象
+     * @deprecated PHP端已改为直接返回带数据的列表
+     * 更新指定传感器的值
      */
     public static JSONObject fetchSensorInfoJSON(int sensor_id, ControlCenter device) throws IOException, JSONException {
         Log.v(LOG_TAG, "fetchSensorInfoJSON() entered");

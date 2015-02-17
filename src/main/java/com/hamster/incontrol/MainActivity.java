@@ -19,11 +19,12 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
+    private static final String TAG = "InControl_MainActivity";
     private Handler mHandler = new Handler();
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private DeviceListViewAdapter mListAdapter;
     private View mEmptyView;
-    private static final String TAG = "InControl_MainActivity";
+    private boolean isFirstLaunch = true; // for refresh only once (like onResume) in onWindowFocusChanged
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class MainActivity extends Activity {
             public void onRefresh() {
                 Log.i(TAG, "onRefresh called from SwipeRefreshLayout");
 
-                refreshSensorList();
+                refreshSensorList(true);
             }
         });
 
@@ -57,10 +58,6 @@ public class MainActivity extends Activity {
         }
         // lv.setEmptyView(mEmptyView);
         // This will cause Swipe indicator to disappear if list is empty
-
-        loadCachedSensors(); // 显示缓存的传感器数据
-        mSwipeRefreshLayout.setRefreshing(true);
-        refreshSensorList(); // 从网络获取传感器数据
     }
 
     @Override
@@ -77,8 +74,7 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            mSwipeRefreshLayout.setRefreshing(true);
-            refreshSensorList();
+            refreshSensorList(false);
             return true;
         } else if (id == R.id.action_settings) {
             Intent intent = new Intent();
@@ -89,9 +85,29 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void refreshSensorList() {
-        Log.v(TAG, "refreshSensorList called");
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        // To let the load animation show on 1st load
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && isFirstLaunch) {
+            refreshSensorList(false);
+            isFirstLaunch = false;
+        }
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // SDK Documentation suggest loading data here. At least not in onCreate
+        loadCachedSensors(); // 显示缓存的传感器数据
+        isFirstLaunch = true;
+    }
+
+    private void refreshSensorList(boolean isCalledFromSwipe) {
+        Log.v(TAG, "refreshSensorList called, isCalledFromSwipe=" + isCalledFromSwipe);
+
+        if (!isCalledFromSwipe) mSwipeRefreshLayout.setRefreshing(true);
         new RefreshDataBackgroundTask().execute();
     }
 
