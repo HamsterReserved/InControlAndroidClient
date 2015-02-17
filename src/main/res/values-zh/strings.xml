@@ -25,4 +25,5 @@
     <string name="menu_view_history">查看历史</string>
     <string name="text_loading">正在刷新……</string>
     <string name="dialog_title_edit_controller">编辑控制器</string>
+    <string name="dialog_title_rename_sensor">重命名传感器</string>
 </resources>

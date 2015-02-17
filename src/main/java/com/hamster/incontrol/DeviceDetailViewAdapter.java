@@ -35,9 +35,13 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
         public void onClick(View v) {
             if (v.getId() == R.id.device_popup_menu) {
                 PopupMenu pop = new PopupMenu(v.getContext(), v);
+
                 // TODO: This is a dirty way to pass info to menuitem. Fix it if possible.
                 Intent intentDummy = new Intent();
-                intentDummy.putExtra("id", ((TextView) ((View) v.getParent()).findViewById(R.id.tv_control_center_id)).getText().toString());
+                intentDummy.putExtra("id", ((TextView)
+                        ((View) v.getParent()).findViewById(R.id.tv_control_center_id))
+                        .getText().toString());
+
                 pop.getMenuInflater().inflate(R.menu.menu_control_center_overflow, pop.getMenu());
                 pop.getMenu().getItem(0).setOnMenuItemClickListener(menuEditOnClickListener);
                 pop.getMenu().getItem(0).setIntent(intentDummy);
@@ -93,7 +97,7 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
             if (cc == null) {
                 return true;
             }
-            et_cc_id.setText(String.valueOf(cc.getDeviceId()));
+            et_cc_id.setText("ID: " + String.valueOf(cc.getDeviceId()));
             et_cc_id.setEnabled(false);
             et_cc_name.setText(cc.getDeviceName());
             et_cc_name.requestFocus();

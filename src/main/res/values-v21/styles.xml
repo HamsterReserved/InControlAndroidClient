@@ -7,6 +7,6 @@
     </style>
 
     <style name="AppTheme" parent="AppBaseTheme">
-        <item name="android:popupMenuStyle">@android:style/Widget.Holo.Light.ListPopupWindow</item>
+        <item name="android:popupMenuStyle">@android:style/Widget.Material.Light.PopupMenu</item>
     </style>
 </resources>

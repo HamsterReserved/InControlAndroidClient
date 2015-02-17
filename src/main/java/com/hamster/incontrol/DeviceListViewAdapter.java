@@ -1,10 +1,16 @@
 package com.hamster.incontrol;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -19,15 +25,68 @@ public class DeviceListViewAdapter extends BaseAdapter {
     private Context mContext = null;
     private LayoutInflater mInflater = null;
     private ArrayList<Sensor> mSensors;
+    private Handler handler = new Handler();
 
     private View.OnClickListener menuOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.sensor_popup_menu) {
                 PopupMenu pop = new PopupMenu(mContext, v);
+
+                // TODO: This is a dirty way to pass info to menuitem. Fix it if possible.
+                Intent intentDummy = new Intent();
+                intentDummy.putExtra("id", ((TextView)
+                        ((View) v.getParent()).findViewById(R.id.tv_sensor_id_invisible))
+                        .getText().toString());
+
                 pop.getMenuInflater().inflate(R.menu.menu_sensor_overflow, pop.getMenu());
+                pop.getMenu().getItem(1).setOnMenuItemClickListener(menuRenameOnClickListener);
+                pop.getMenu().getItem(1).setIntent(intentDummy);
                 pop.show();
             }
+        }
+    };
+
+    private MenuItem.OnMenuItemClickListener menuRenameOnClickListener = new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            View dialogView = inflater.inflate(R.layout.sensor_rename_dialog, null);
+            int sensorId = Integer.parseInt(item.getIntent().getStringExtra("id"));
+            final Sensor matchSensor = findSensorById(sensorId);
+
+            builder.setTitle(R.string.dialog_title_rename_sensor) // TODO Resource-ify
+                    .setView(dialogView)
+                    .setNegativeButton(R.string.button_cancel, null);
+            AlertDialog dialog = builder.create();
+
+            final EditText et_name = (EditText) dialogView.findViewById(R.id.et_sensor_name);
+            et_name.setText(matchSensor.getSensorName());
+
+            DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String newName = et_name.getText().toString();
+                    if (newName != null && !newName.equals(matchSensor.getSensorName())) {
+                        matchSensor.setSensorName(newName, true); // Ask to upload now.
+                        // It's so difficult to refresh the things
+                        // TODO Why can't we do this inside the adapter since it's carrying this role?
+                        ((MainActivity) mContext).getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((MainActivity) mContext).loadCachedSensors();
+                            }
+                        });
+                    }
+                }
+            };
+
+            dialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                    mContext.getResources().getString(R.string.button_ok),
+                    onClickListener);
+            dialog.show();
+            return true;
         }
     };
 
@@ -73,6 +132,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
         TextView update_time = (TextView) convertView.findViewById(R.id.update_time);
         // ImageView image = (ImageView) convertView.findViewById(R.id.sensor_pic);
         ImageButton ib = (ImageButton) convertView.findViewById(R.id.sensor_popup_menu);
+        TextView hidden_sensor_id = (TextView) convertView.findViewById(R.id.tv_sensor_id_invisible);
 
         Sensor this_sensor = mSensors.get(position);
         sensor_name.setText(this_sensor.getSensorName());
@@ -81,6 +141,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
                 + this_sensor.getSensorCachedValue());
         update_time.setText(TimeStamp2Date(this_sensor.getLastUpdateDate()));
         //image.setPic(this_sens.getType)
+        hidden_sensor_id.setText(String.valueOf(this_sensor.getSensorId()));
         ib.setOnClickListener(menuOnClickListener);
 
         return convertView;
@@ -107,5 +168,20 @@ public class DeviceListViewAdapter extends BaseAdapter {
             v.setVisibility(View.VISIBLE);
         else
             v.setVisibility(View.GONE);
+    }
+
+    /**
+     * Note that this is only for internal use.
+     * It only searches in this adapter's memory.
+     * Useful for quick search when adapters info is loaded into adapter already.
+     *
+     * @param id ID to search
+     * @return the ControlCenter found, or null
+     */
+    private Sensor findSensorById(int id) {
+        for (Sensor snr : mSensors) {
+            if (snr.getSensorId() == id) return snr;
+        }
+        return null;
     }
 }

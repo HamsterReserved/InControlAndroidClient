@@ -83,5 +83,10 @@
             android:src="@drawable/overflow_card"
             android:tint="@android:color/tertiary_text_light" />
 
+        <TextView
+            android:id="@+id/tv_sensor_id_invisible"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

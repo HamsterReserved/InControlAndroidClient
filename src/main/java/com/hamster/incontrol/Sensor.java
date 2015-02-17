@@ -128,9 +128,11 @@ public class Sensor {
      */
     public void setSensorName(String mSensorName, boolean upload) {
         this.mSensorName = mSensorName;
+        if (this.isInfoComplete())
+            this.saveToDatabase(); // We are *changing* name, not just initializing
         if (upload) {
             if (this.isInfoComplete()) {
-                // Upload to control center
+                // TODO Upload to control center
             } else {
                 throw new IllegalArgumentException("Sensor ID is not defined!");
             }
@@ -146,7 +148,9 @@ public class Sensor {
     }
 
     public boolean isInfoComplete() {
-        return mSensorId != INVALID_SENSOR_ID;
+        return mSensorId != INVALID_SENSOR_ID &&
+                mSensorType != null &&
+                mParentControlCenter != null;
     }
 
     /**

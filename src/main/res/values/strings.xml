@@ -27,5 +27,6 @@
     <string name="menu_remove">Remove</string>
     <string name="text_loading">Refreshing...</string>
     <string name="dialog_title_edit_controller">Edit Controller</string>
+    <string name="dialog_title_rename_sensor">Rename sensor</string>
 
 </resources>

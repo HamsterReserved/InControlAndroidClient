@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
         });
 
         ListView lv = (ListView) mSwipeRefreshLayout.findViewById(R.id.device_list);
-        mListAdapter = new DeviceListViewAdapter(getApplicationContext());
+        mListAdapter = new DeviceListViewAdapter(this);
         lv.setAdapter(mListAdapter);
     }
 
@@ -113,7 +113,7 @@ public class MainActivity extends Activity {
         new RefreshDataBackgroundTask().execute();
     }
 
-    private void loadCachedSensors() {
+    public void loadCachedSensors() {
         LocalConfigStore lcs = new LocalConfigStore(this.getApplicationContext());
         final ControlCenter[] ccs = lcs.getControlCenters(); // This is local only
 
@@ -128,6 +128,10 @@ public class MainActivity extends Activity {
         }
         mListAdapter.reloadDataWithEmptyView(mEmptyView);
     }
+
+    public Handler getHandler() {
+        return mHandler;
+    } // Yes I'm crazy
 
     private void onRefreshComplete(Sensor[] snrs) {
         Log.v(TAG, "onRefreshComplete");
