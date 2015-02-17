@@ -25,6 +25,8 @@ public class MainActivity extends Activity {
     private DeviceListViewAdapter mListAdapter;
     private View mEmptyView;
     private boolean isFirstLaunch = true; // for refresh only once (like onResume) in onWindowFocusChanged
+    private RefreshDataBackgroundTask mRefreshBGTask;
+    private Menu mOptionsMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,7 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        mOptionsMenu = menu;
         return true;
     }
 
@@ -74,8 +77,7 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            refreshSensorList(false);
-            return true;
+            // Handled by switchRefreshButton
         } else if (id == R.id.action_settings) {
             Intent intent = new Intent();
             intent.setClass(this.getApplicationContext(), ControlCenterActivity.class);
@@ -101,14 +103,17 @@ public class MainActivity extends Activity {
 
         // SDK Documentation suggest loading data here. At least not in onCreate
         loadCachedSensors(); // 显示缓存的传感器数据
-        isFirstLaunch = true;
+        isFirstLaunch = true; // DO NOT load from network here :-)
     }
 
     private void refreshSensorList(boolean isCalledFromSwipe) {
         Log.v(TAG, "refreshSensorList called, isCalledFromSwipe=" + isCalledFromSwipe);
 
         if (!isCalledFromSwipe) mSwipeRefreshLayout.setRefreshing(true);
-        new RefreshDataBackgroundTask().execute();
+        mRefreshBGTask = new RefreshDataBackgroundTask();
+        mRefreshBGTask.execute();
+
+        switchRefreshButton(false);
     }
 
     private void loadCachedSensors() {
@@ -139,6 +144,30 @@ public class MainActivity extends Activity {
 
         // Stop the refreshing indicator
         mSwipeRefreshLayout.setRefreshing(false);
+        switchRefreshButton(true);
+    }
+
+    private void switchRefreshButton(boolean isRefreshOrCancel) {
+        MenuItem mi = mOptionsMenu.getItem(0);
+        if (isRefreshOrCancel) {
+            mi.setIcon(R.drawable.ic_refresh);
+            mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    refreshSensorList(false);
+                    return true;
+                }
+            });
+        } else {
+            mi.setIcon(R.drawable.ic_cancel);
+            mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    mRefreshBGTask.cancel(true);
+                    return true;
+                }
+            });
+        }
     }
 
     private class RefreshDataBackgroundTask extends AsyncTask<Void, Void, Sensor[]> {
@@ -162,6 +191,7 @@ public class MainActivity extends Activity {
                                     e.getLocalizedMessage(), // TODO this is hardcoded in NetworkAccessor in Chinese
                                     Toast.LENGTH_SHORT).show();
                             loadCachedSensors();
+                            switchRefreshButton(true);
                         }
                     });
                     return null; // We don't want incomplete data to go through. Just show cached.
@@ -185,5 +215,10 @@ public class MainActivity extends Activity {
             onRefreshComplete(result);
         }
 
+        @Override
+        protected void onCancelled() {
+            Log.v(TAG, "onCancelled");
+            switchRefreshButton(true);
+        }
     }
 }
