@@ -15,24 +15,24 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by Hamster on 2015/1/11.
  * </p>
  * 用来操作数据库，比如读写本机ID，缓存传感器信息等
- * 用前open，用后close
+ * 用前会自动open，用后要手动close
  */
 public class LocalConfigStore {
-    private static int DB_VERSION = 1;
-    private static String LOG_TAG = "InControl_LCS";
-    private static String DEFAULT_DB_FILENAME = "incontrol_android.db";
+    private static final int DB_VERSION = 1;
+    private static final String LOG_TAG = "InControl_LCS";
+    private static final String DEFAULT_DB_FILENAME = "incontrol_android.db";
 
-    private static String MYDEVICE_TABLE_NAME = "mydevice";
-    private static String SENSORS_TABLE_NAME = "sensors";
-    private static String DEVICE_ID_KEY = "device_id"; // in mydevice
-    private static String DEVICE_NAME_KEY = "device_name";
-    private static String DEVICE_CREDENTIALS_KEY = "user_credentials";
-    private static String SENSOR_ID_KEY = "sensor_id"; // sensors table
-    private static String SENSOR_NAME_KEY = "sensor_name";
-    private static String SENSOR_TYPE_KEY = "sensor_type";
-    private static String SENSOR_CACHED_VALUE_KEY = "sensor_cached_value";
-    private static String SENSOR_UPDATE_DATE_KEY = "sensor_update_date";
-    private static String SENSOR_PARENT_CONTROL_ID_KEY = "sensor_parent_control_id";
+    private static final String MYDEVICE_TABLE_NAME = "mydevice";
+    private static final String SENSORS_TABLE_NAME = "sensors";
+    private static final String DEVICE_ID_KEY = "device_id"; // in mydevice
+    private static final String DEVICE_NAME_KEY = "device_name";
+    private static final String DEVICE_CREDENTIALS_KEY = "user_credentials";
+    private static final String SENSOR_ID_KEY = "sensor_id"; // sensors table
+    private static final String SENSOR_NAME_KEY = "sensor_name";
+    private static final String SENSOR_TYPE_KEY = "sensor_type";
+    private static final String SENSOR_CACHED_VALUE_KEY = "sensor_cached_value";
+    private static final String SENSOR_UPDATE_DATE_KEY = "sensor_update_date";
+    private static final String SENSOR_PARENT_CONTROL_ID_KEY = "sensor_parent_control_id";
 
     private Context mContext;
     private DatabaseHelper dbhelper;

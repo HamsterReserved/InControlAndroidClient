@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 
 
 public class ControlCenterActivity extends Activity {
@@ -109,13 +108,5 @@ public class ControlCenterActivity extends Activity {
 
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, res.getText(R.string.button_ok), ocl_positive);
         alertDialog.show();
-    }
-
-    public void showPopup(View v) {
-        if (v.getId() == R.id.device_popup_menu) {
-            PopupMenu pop = new PopupMenu(getApplicationContext(), v);
-            pop.getMenuInflater().inflate(R.menu.menu_control_center_overflow, pop.getMenu());
-            pop.show();
-        }
     }
 }

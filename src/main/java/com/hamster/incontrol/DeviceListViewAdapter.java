@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -60,24 +59,22 @@ public class DeviceListViewAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        // TODO Auto-generated method stub
-        return 0;
+        // Is this needed by Cursors?
+        return position;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //TODO: Implement!
         if (convertView == null)
             convertView = mInflater.inflate(R.layout.sensor_info_detail, null);
         TextView sensor_name = (TextView) convertView.findViewById(R.id.sensor_name);
         TextView device_name = (TextView) convertView.findViewById(R.id.device_name);
         TextView status_message = (TextView) convertView.findViewById(R.id.status_message);
         TextView update_time = (TextView) convertView.findViewById(R.id.update_time);
-        ImageView image = (ImageView) convertView.findViewById(R.id.sensor_pic);
+        // ImageView image = (ImageView) convertView.findViewById(R.id.sensor_pic);
         ImageButton ib = (ImageButton) convertView.findViewById(R.id.sensor_popup_menu);
 
         Sensor this_sensor = mSensors.get(position);
-        if (this_sensor == null) return null; // TODO: WTF? Why is this happening?
         sensor_name.setText(this_sensor.getSensorName());
         device_name.setText("@" + this_sensor.getParentControlCenter().getDeviceName());
         status_message.setText(mContext.getResources().getText(R.string.current_value)

@@ -135,8 +135,7 @@ public class NetworkAccessor {
         if (httpResponse.getStatusLine().getStatusCode() == 200) {
             String retStr = EntityUtils.toString(httpResponse.getEntity());
 
-            JSONArray jsonArray = new JSONArray(retStr);
-            return jsonArray;
+            return new JSONArray(retStr);
         } else if (httpResponse.getStatusLine().getStatusCode() == 501) { // "Not implemented"
             throw new IOException("参数错误，请检查是否存在错误的设备ID！ Detail: "
                     + EntityUtils.toString(httpResponse.getEntity()));

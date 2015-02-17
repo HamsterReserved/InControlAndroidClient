@@ -38,9 +38,7 @@ public class ControlCenter {
     }
 
     public boolean isInfoComplete() {
-        if (this.device_id == INVALID_DEVICE_ID)
-            return false;
-        return true;
+        return !(this.device_id == INVALID_DEVICE_ID);
     }
 
     // 以下是自动生成的，Android Studio大法好
@@ -65,7 +63,7 @@ public class ControlCenter {
     }
 
     public void setSensors(Sensor[] sensors) {
-        this.sensors = sensors;
+        this.sensors = sensors; // This is usually set by updateSensors. No need to add here...
     }
 
     public String getCredentials() {
