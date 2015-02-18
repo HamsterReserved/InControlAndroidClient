@@ -272,7 +272,8 @@ public class LocalConfigStore {
                 "sensor_name text," +
                 "sensor_cached_value text," +
                 "sensor_update_date integer," +
-                "sensor_parent_control_id integer)";
+                "sensor_parent_control_id integer," +
+                "sensor_trigger text)";
 
         DatabaseHelper(Context context) {
             super(context, DEFAULT_DB_FILENAME, null, DB_VERSION);

@@ -50,6 +50,7 @@ public class Sensor {
     private long mLastUpdateDate;
     private ControlCenter mParentControlCenter;
     private Context mContext;
+    private String mTriggers; // 注意这个没在sensor list里，要自己获取才可以
 
     /**
      * @param parent_cc 所属ControlCenter
@@ -145,6 +146,15 @@ public class Sensor {
 
     public void setParentControlCenter(ControlCenter mParentControlCenter) {
         this.mParentControlCenter = mParentControlCenter;
+    }
+
+
+    public String getTriggerString() {
+        return mTriggers;
+    }
+
+    public void setTriggerString(String mTriggers) {
+        this.mTriggers = mTriggers;
     }
 
     public boolean isInfoComplete() {

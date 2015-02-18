@@ -1,5 +1,6 @@
 package com.hamster.incontrol;
 
+import android.util.Base64;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
@@ -75,45 +76,35 @@ public class NetworkAccessor {
     public static final String JSON_SENSOR_VALUE_KEY = "sensor_value";
     public static final String JSON_SENSOR_DATE_KEY = "sensor_date";
 
+    private static final String JSON_DEVICE_ID_KEY = "device_id";
+    private static final String JSON_DEVICE_NAME_KEY = "device_name";
+    // private static final String JSON_DEVICE_CREDENTIALS_KEY = "cred"; Not used anywhere
+    private static final String JSON_DEVICE_MAN_DATE = "man_date"; // Manufacturing date
+    private static final String JSON_DEVICE_REG_DATE = "reg_date"; // Nearest registering date, maybe changed to 1st one
+
+    private static final String URL_DEVICE_ID_KEY = "device_id";
+    private static final String URL_DEVICE_TYPE_KEY = "device_type";
+    private static final String URL_SENSOR_ID_KEY = "sensor_id";
+    private static final String URL_REQUEST_TYPE_KEY = "request_type";
+    private static final String URL_SENSOR_NAME_KEY = "name"; // Not sensor_name !
+    private static final String URL_DEVICE_NAME_KEY = "name"; // Same as above
+
     /**
+     * @deprecated PHP端已改为直接返回带数据的列表
+     *
      * @param sensor_id 传感器ID
      * @return 此传感器数据的JSON对象
-     * @deprecated PHP端已改为直接返回带数据的列表
      * 更新指定传感器的值
      */
     public static JSONObject fetchSensorInfoJSON(int sensor_id, ControlCenter device) throws IOException, JSONException {
         Log.v(LOG_TAG, "fetchSensorInfoJSON() entered");
-        Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put("device_id", String.valueOf(device.getDeviceId()));
-        paramMap.put("device_type", String.valueOf(DEVICE_TYPE));
-        paramMap.put("request_type", String.valueOf(REQUEST_TYPE_QUERY_SENSOR_INFO));
-        paramMap.put("sensor_id", String.valueOf(sensor_id));
+        Map<String, String> paramMap = new HashMap<>(4);
+        paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(device.getDeviceId()));
+        paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
+        paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_QUERY_SENSOR_INFO));
+        paramMap.put(URL_SENSOR_ID_KEY, String.valueOf(sensor_id));
 
-        HttpGet httpGet = new HttpGet(buildUrlWithParams(paramMap));
-        HttpClient httpClient = new DefaultHttpClient();
-        Log.v(LOG_TAG, "fetchSensorListJSON() ready to sent request");
-        HttpResponse httpResponse = httpClient.execute(httpGet);
-        Log.v(LOG_TAG, "fetchSensorListJSON() got response");
-
-        if (httpResponse.getStatusLine().getStatusCode() == 200) {
-            Log.v(LOG_TAG, "fetchSensorListJSON() status code = 200");
-            String retStr = EntityUtils.toString(httpResponse.getEntity());
-
-            JSONObject json = new JSONObject(retStr);
-            return json;
-        } else if (httpResponse.getStatusLine().getStatusCode() == 501) { // "Not implemented"
-            // TODO 程序会卡!
-            Log.e(LOG_TAG, "fetchSensorListJSON() status code = 501, msg="
-                    + EntityUtils.toString(httpResponse.getEntity()));
-            throw new IOException("URL Parameters Error! Detail: "
-                    + EntityUtils.toString(httpResponse.getEntity()));
-        } else {
-            // TODO 程序会卡！
-            Log.e(LOG_TAG, "fetchSensorListJSON() status code = (unknown) "
-                    + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
-            throw new IOException("HTTP Return Code unknown: "
-                    + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
-        }
+        return new JSONObject(getHttpReturnString(paramMap));
     }
 
 
@@ -123,39 +114,86 @@ public class NetworkAccessor {
      * @return JSONArray 传感器数组
      */
     public static JSONArray fetchSensorListJSON(ControlCenter device) throws IOException, JSONException {
-        Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put("device_id", String.valueOf(device.getDeviceId()));
-        paramMap.put("device_type", String.valueOf(DEVICE_TYPE));
-        paramMap.put("request_type", String.valueOf(REQUEST_TYPE_QUERY_SENSORS_LIST));
+        Map<String, String> paramMap = new HashMap<>(3);
+        paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(device.getDeviceId()));
+        paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
+        paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_QUERY_SENSORS_LIST));
 
-        HttpGet httpGet = new HttpGet(buildUrlWithParams(paramMap));
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpResponse httpResponse = httpClient.execute(httpGet);
+        return new JSONArray(getHttpReturnString(paramMap));
+    }
 
-        if (httpResponse.getStatusLine().getStatusCode() == 200) {
-            String retStr = EntityUtils.toString(httpResponse.getEntity());
+    /**
+     * 上传传感器名字更新到服务器
+     *
+     * @param snr 已经改过名字的Sensor实例
+     * @return true=成功 false=失败
+     */
+    public static boolean uploadSensorName(Sensor snr) throws IOException {
+        Map<String, String> paramMap = new HashMap<>(5);
+        paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(snr.getParentControlCenter().getDeviceId()));
+        paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
+        paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_NAME));
+        paramMap.put(URL_SENSOR_NAME_KEY, Base64.encodeToString(snr.getSensorName().getBytes(), Base64.URL_SAFE));
+        paramMap.put(URL_SENSOR_ID_KEY, String.valueOf(snr.getSensorId()));
 
-            return new JSONArray(retStr);
-        } else if (httpResponse.getStatusLine().getStatusCode() == 501) { // "Not implemented"
-            throw new IOException("参数错误，请检查是否存在错误的设备ID！ Detail: "
-                    + EntityUtils.toString(httpResponse.getEntity()));
-        } else {
-            throw new IOException("HTTP返回码未知: "
-                    + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
+        try {
+            JSONObject json = new JSONObject(getHttpReturnString(paramMap));
+            if (json.getString("result").equals("ok"))
+                return true;
+        } catch (JSONException e) { // No such key
+            Log.e(LOG_TAG, "updateSensorName failed with JSON exp: " + e.getLocalizedMessage());
         }
+        return false;
+    }
+
+    /**
+     * 上传控制器名字更新到服务器
+     *
+     * @param cc 已经改过名字的ControlCenter实例
+     * @return true=成功 false=失败
+     */
+    public static boolean uploadDeviceName(ControlCenter cc) throws IOException {
+        Map<String, String> paramMap = new HashMap<>(5);
+        paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(cc.getDeviceId()));
+        paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
+        paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_NAME));
+        paramMap.put(URL_DEVICE_NAME_KEY, Base64.encodeToString(cc.getDeviceName().getBytes(), Base64.URL_SAFE));
+
+        try {
+            JSONObject json = new JSONObject(getHttpReturnString(paramMap));
+            if (json.getString("result").equals("ok"))
+                return true;
+        } catch (JSONException e) { // No such key
+            Log.e(LOG_TAG, "updateSensorName failed with JSON exp: " + e.getLocalizedMessage());
+        }
+        return false;
+    }
+
+    public static boolean loadDeviceInfo(ControlCenter cc) throws IOException {
+        Map<String, String> paramMap = new HashMap<>(3);
+        paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(cc.getDeviceId()));
+        paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
+        paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_QUERY_DEVICE_INFO));
+
+        try {
+            JSONObject json = new JSONObject(getHttpReturnString(paramMap));
+            cc.setDeviceName(json.getString(JSON_DEVICE_NAME_KEY));
+            cc.setManDate(json.getInt(JSON_DEVICE_MAN_DATE));
+            cc.setRegDate(json.getInt(JSON_DEVICE_REG_DATE));
+            return true;
+        } catch (JSONException e) { // No such key
+            Log.e(LOG_TAG, "loadDeviceInfo failed with JSON exp: " + e.getLocalizedMessage());
+        }
+        return false;
     }
 
     private static String buildUrlWithParams(Map map) {
         StringBuilder sb = new StringBuilder(INCONTROL_API_URL);
         Set entryset = map.entrySet();
         Iterator iter = entryset.iterator();
-        boolean isFirstParam = true;
 
+        sb.append("?");
         while (iter.hasNext()) {
-            if (isFirstParam) {
-                sb.append("?");
-                isFirstParam = false;
-            }
             Map.Entry<String, String> me = (Map.Entry<String, String>) iter.next();
             sb.append(me.getKey());
             sb.append("=");
@@ -165,5 +203,28 @@ public class NetworkAccessor {
 
         sb.deleteCharAt(sb.length() - 1); // Remove trailing "&"
         return sb.toString();
+    }
+
+    private static String getHttpReturnString(Map paramMap) throws IOException, JSONException {
+        HttpGet httpGet = new HttpGet(buildUrlWithParams(paramMap));
+        HttpClient httpClient = new DefaultHttpClient();
+        Log.v(LOG_TAG, "fetchSensorListJSON() ready to sent request");
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        Log.v(LOG_TAG, "fetchSensorListJSON() got response, returning");
+
+        if (httpResponse.getStatusLine().getStatusCode() == 200) {
+            Log.v(LOG_TAG, "getHttpReturnString() status code = 200");
+            return EntityUtils.toString(httpResponse.getEntity());
+        } else if (httpResponse.getStatusLine().getStatusCode() == 501) { // "Not implemented"
+            Log.e(LOG_TAG, "getHttpReturnString() status code = 501, msg="
+                    + EntityUtils.toString(httpResponse.getEntity()));
+            throw new IOException("参数错误，请检查是否存在错误的设备ID！ Detail: "
+                    + EntityUtils.toString(httpResponse.getEntity()));
+        } else {
+            Log.e(LOG_TAG, "getHttpReturnString() status code = (unknown) "
+                    + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
+            throw new IOException("HTTP返回码未知: "
+                    + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
+        }
     }
 }
