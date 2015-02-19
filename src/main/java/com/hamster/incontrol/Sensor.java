@@ -1,6 +1,10 @@
 package com.hamster.incontrol;
 
 import android.content.Context;
+import android.widget.Toast;
+
+import com.hamster.incontrol.NetworkBackgroundOperator.BackgroundTaskDesc;
+import com.hamster.incontrol.NetworkBackgroundOperator.Operation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,6 +72,7 @@ public class Sensor {
             Value = value;
         }
     }
+
     /**
      * 默认的无效传感器ID，表明此实例还没有初始化
      */
@@ -167,7 +172,7 @@ public class Sensor {
     /**
      * 设置传感器名称（上传）
      * <p/><p/>
-     * 若要上传，请先确定ID已设好，否则会报错IllegalArgument
+     * 若要上传，请先确定ID已设好，否则会报错IllegalArgument，并且要多开一个AsyncTask
      *
      * @param mSensorName 新的传感器名称
      * @param upload      是否上传到控制中心储存
@@ -177,7 +182,20 @@ public class Sensor {
         if (this.isInfoComplete()) {
             this.saveToDatabase(); // We are *changing* name, not just initializing
             if (upload) {
-                return NetworkAccessor.uploadSensorName(this);
+                BackgroundTaskDesc task =
+                        new BackgroundTaskDesc(Operation.OPERATION_RENAME_SENSOR,
+                                this,
+                                null,
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(mContext,
+                                                mContext.getResources().getString(R.string.toast_error_renaming_sensor),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                NetworkBackgroundOperator op = new NetworkBackgroundOperator(task);
+                op.execute();
             }
         }
         return true;
@@ -209,7 +227,20 @@ public class Sensor {
         if (this.isInfoComplete()) {
             this.saveToDatabase();
             if (upload) {
-                return NetworkAccessor.uploadSensorTrigger(this);
+                BackgroundTaskDesc task =
+                        new BackgroundTaskDesc(Operation.OPERATION_UPLOAD_SENSOR_TRIGGER,
+                                this,
+                                null,
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(mContext, // TODO STRING
+                                                mContext.getResources().getString(R.string.toast_error_renaming_sensor),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                NetworkBackgroundOperator op = new NetworkBackgroundOperator(task);
+                op.execute();
             }
         }
         return true;

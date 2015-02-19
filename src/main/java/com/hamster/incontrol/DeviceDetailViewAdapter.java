@@ -107,7 +107,7 @@ public class DeviceDetailViewAdapter extends BaseAdapter {
             DialogInterface.OnClickListener ocl_positive = new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     ControlCenter cc = new ControlCenter(mContext);
-                    cc.setDeviceId(Integer.parseInt(et_cc_id.getText().toString()));
+                    cc.setDeviceId(Integer.parseInt(et_cc_id.getText().toString().substring(4))); // Remove prefix "ID: "
                     // -1 if null, which is exactly INVAILD_SENSOR_ID
                     cc.setDeviceName(et_cc_name.getText().toString());
                     cc.setCredentials(et_cc_cred.getText().toString());

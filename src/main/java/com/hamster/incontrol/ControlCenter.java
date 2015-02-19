@@ -1,6 +1,10 @@
 package com.hamster.incontrol;
 
 import android.content.Context;
+import android.widget.Toast;
+
+import com.hamster.incontrol.NetworkBackgroundOperator.BackgroundTaskDesc;
+import com.hamster.incontrol.NetworkBackgroundOperator.Operation;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,10 +69,32 @@ public class ControlCenter {
         }
     }
 
+    /**
+     * 记得要开AsyncTask，否则不允许访问网络
+     *
+     * @param device_name
+     * @param upload
+     * @return
+     * @throws IOException
+     * @throws JSONException
+     */
     public boolean setDeviceName(String device_name, boolean upload) throws IOException, JSONException {
         this.device_name = device_name;
         if (this.isInfoComplete() && upload) {
-            return NetworkAccessor.uploadDeviceName(this);
+            BackgroundTaskDesc task =
+                    new BackgroundTaskDesc(Operation.OPERATION_RENAME_DEVICE,
+                            this,
+                            null,
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, // TODO　string: renaming device
+                                            context.getResources().getString(R.string.toast_error_renaming_sensor),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+            NetworkBackgroundOperator op = new NetworkBackgroundOperator(task);
+            op.execute();
         }
         return true;
     }
@@ -111,9 +137,19 @@ public class ControlCenter {
     public void updateSensors() throws IOException, JSONException {
         JSONArray jsonArray = NetworkAccessor.fetchSensorListJSON(this);
 
+        int invalid_sensor_count = 0;
+        for (int i = 0; i < jsonArray.length(); ++i) {
+            if (jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY) == Sensor.INVALID_SENSOR_ID)
+                invalid_sensor_count++; // For compatability. .remove is available in API 19+
+        }
+
         this.sensors = null; // To keep that fresh w/o memory leak?
-        this.sensors = new Sensor[jsonArray.length()];
+        this.sensors = new Sensor[jsonArray.length() - invalid_sensor_count];
+
         for (int i = 0; i < sensors.length; ++i) {
+            if (jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY) == Sensor.INVALID_SENSOR_ID) {
+                continue;
+            }
             sensors[i] = new Sensor(this, this.context);
             sensors[i].setSensorId(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY));
             sensors[i].setSensorType(Sensor.convertIntToType(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_TYPE_KEY)));

@@ -275,6 +275,7 @@ class LocalConfigStore {
             return null;
         }
 
+        cursor.moveToFirst();
         ControlCenter cc = new ControlCenter(mContext);
 
         Cursor cc_cursor = db.query(MYDEVICE_TABLE_NAME,
@@ -290,6 +291,7 @@ class LocalConfigStore {
             return null;
         }
 
+        cc_cursor.moveToFirst(); // Need this after getCount ... Why?
         cc.setDeviceName(cc_cursor.getString(0));
         cc.setDeviceId(cc_cursor.getInt(1));
         cc.setCredentials(cc_cursor.getString(2));

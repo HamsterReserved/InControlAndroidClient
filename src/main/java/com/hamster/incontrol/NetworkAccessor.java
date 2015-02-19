@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Created by Hamster on 2014/12/14.
  * <p/>
- * 用来从云端读取主机数据的类
+ * 用来从云端读取主机数据的类，只负责网络，多线程要在其他地方满足
  */
 class NetworkAccessor {
     private static final String LOG_TAG = "InControl_NA";
@@ -136,7 +136,7 @@ class NetworkAccessor {
         paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(snr.getParentControlCenter().getDeviceId()));
         paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
         paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_NAME));
-        paramMap.put(URL_SENSOR_NAME_KEY, Base64.encodeToString(snr.getSensorName().getBytes(), Base64.URL_SAFE));
+        paramMap.put(URL_SENSOR_NAME_KEY, Base64.encodeToString(snr.getSensorName().getBytes(), Base64.NO_WRAP | Base64.URL_SAFE));
         paramMap.put(URL_SENSOR_ID_KEY, String.valueOf(snr.getSensorId()));
 
         try {

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -164,16 +165,13 @@ class DeviceListViewAdapter extends BaseAdapter {
         device_name.setText("@" + this_sensor.getParentControlCenter().getDeviceName());
         status_message.setText(mContext.getResources().getText(R.string.current_value)
                 + this_sensor.getSensorCachedValue());
-        update_time.setText(TimeStamp2Date(this_sensor.getLastUpdateDate()));
+        update_time.setText(DateUtils.getRelativeTimeSpanString(this_sensor.getLastUpdateDate() * 1000,
+                System.currentTimeMillis(), 0));
         //image.setPic(this_sens.getType)
         hidden_sensor_id.setText(String.valueOf(this_sensor.getSensorId()));
         ib.setOnClickListener(menuOnClickListener);
 
         return convertView;
-    }
-
-    public String TimeStamp2Date(long timestamp) {
-        return new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(timestamp * 1000));
     }
 
     public void clearAll(boolean isShownImmediately) {
