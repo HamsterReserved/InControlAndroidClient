@@ -14,10 +14,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class DeviceListViewAdapter extends BaseAdapter {
+class DeviceListViewAdapter extends BaseAdapter {
 
     /**
      * Items in List
@@ -42,6 +45,8 @@ public class DeviceListViewAdapter extends BaseAdapter {
                 pop.getMenuInflater().inflate(R.menu.menu_sensor_overflow, pop.getMenu());
                 pop.getMenu().getItem(1).setOnMenuItemClickListener(menuRenameOnClickListener);
                 pop.getMenu().getItem(1).setIntent(intentDummy);
+                pop.getMenu().getItem(2).setOnMenuItemClickListener(menuShowHistoryOnClickListener);
+                pop.getMenu().getItem(2).setIntent(intentDummy);
                 pop.show();
             }
         }
@@ -69,15 +74,26 @@ public class DeviceListViewAdapter extends BaseAdapter {
                 public void onClick(DialogInterface dialog, int which) {
                     String newName = et_name.getText().toString();
                     if (newName != null && !newName.equals(matchSensor.getSensorName())) {
-                        matchSensor.setSensorName(newName, true); // Ask to upload now.
-                        // It's so difficult to refresh the things
-                        // TODO Why can't we do this inside the adapter since it's carrying this role?
-                        ((MainActivity) mContext).getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                ((MainActivity) mContext).loadCachedSensors();
-                            }
-                        });
+                        try {
+                            matchSensor.setSensorName(newName, true); // Ask to upload now.
+                            // It's so difficult to refresh the things
+                            // TODO Why can't we do this inside the adapter since it's carrying this role?
+                            ((MainActivity) mContext).getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((MainActivity) mContext).loadCachedSensors();
+                                }
+                            });
+                        } catch (final IOException e) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(mContext,
+                                            mContext.getResources().getString(R.string.toast_error_renaming_sensor) +
+                                                    e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 }
             };
@@ -86,6 +102,17 @@ public class DeviceListViewAdapter extends BaseAdapter {
                     mContext.getResources().getString(R.string.button_ok),
                     onClickListener);
             dialog.show();
+            return true;
+        }
+    };
+
+    private MenuItem.OnMenuItemClickListener menuShowHistoryOnClickListener = new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Intent intent = new Intent();
+            intent.setClass(mContext, SensorHistoryActivity.class);
+            intent.putExtra("id", Integer.parseInt(item.getIntent().getStringExtra("id")));
+            mContext.startActivity(intent);
             return true;
         }
     };
@@ -99,9 +126,7 @@ public class DeviceListViewAdapter extends BaseAdapter {
 
     public void addToSensors(Sensor new_sensors[]) {
         if (new_sensors == null) return;
-        for (int i = 0; i < new_sensors.length; ++i) {
-            mSensors.add(new_sensors[i]);
-        }
+        Collections.addAll(mSensors, new_sensors);
     }
 
     @Override

@@ -3,7 +3,7 @@
     android:id="@+id/manage_device_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#eeeeee"
+    android:background="@android:color/transparent"
     android:clipToPadding="false"
     android:divider="#dddddd"
     android:dividerHeight="1dp"

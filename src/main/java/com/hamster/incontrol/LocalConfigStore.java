@@ -18,7 +18,7 @@ import android.util.Log;
  * 用来操作数据库，比如读写本机ID，缓存传感器信息等
  * 用前会自动open，用后要手动close
  */
-public class LocalConfigStore {
+class LocalConfigStore {
     private static final int DB_VERSION = 1;
     private static final String LOG_TAG = "InControl_LCS";
     private static final String DEFAULT_DB_FILENAME = "incontrol_android.db";
@@ -34,6 +34,7 @@ public class LocalConfigStore {
     private static final String SENSOR_CACHED_VALUE_KEY = "sensor_cached_value";
     private static final String SENSOR_UPDATE_DATE_KEY = "sensor_update_date";
     private static final String SENSOR_PARENT_CONTROL_ID_KEY = "sensor_parent_control_id";
+    private static final String SENSOR_TRIGGER_KEY = "sensor_trigger";
 
     private Context mContext;
     private DatabaseHelper dbhelper;
@@ -220,7 +221,8 @@ public class LocalConfigStore {
                         SENSOR_NAME_KEY,
                         SENSOR_TYPE_KEY,
                         SENSOR_UPDATE_DATE_KEY,
-                        SENSOR_CACHED_VALUE_KEY},
+                        SENSOR_CACHED_VALUE_KEY,
+                        SENSOR_TRIGGER_KEY},
                 SENSOR_PARENT_CONTROL_ID_KEY + " = ?",
                 new String[]{String.valueOf(cc.getDeviceId())},
                 null, null, null);
@@ -241,11 +243,66 @@ public class LocalConfigStore {
             sensors[i].setSensorType(Sensor.convertIntToType(cursor.getInt(2)));
             sensors[i].setLastUpdateDate(cursor.getInt(3));
             sensors[i].setSensorCachedValue(cursor.getString(4));
+            sensors[i].setTriggerString(cursor.getString(5));
             cursor.moveToNext();
             i++;
         }
         cursor.close();
         return sensors;
+    }
+
+    /**
+     * The long-waited function is finally here!
+     *
+     * @param sensor_id to query
+     * @return the found sensor
+     */
+    public Sensor getSensorById(int sensor_id) {
+        Cursor cursor = db.query(SENSORS_TABLE_NAME,
+                new String[]{SENSOR_ID_KEY,
+                        SENSOR_NAME_KEY,
+                        SENSOR_TYPE_KEY,
+                        SENSOR_UPDATE_DATE_KEY,
+                        SENSOR_CACHED_VALUE_KEY,
+                        SENSOR_PARENT_CONTROL_ID_KEY,
+                        SENSOR_TRIGGER_KEY},
+                SENSOR_ID_KEY + " = ?",
+                new String[]{String.valueOf(sensor_id)},
+                null, null, null);
+
+        if (cursor.getCount() == 0) {
+            cursor.close();
+            return null;
+        }
+
+        ControlCenter cc = new ControlCenter(mContext);
+
+        Cursor cc_cursor = db.query(MYDEVICE_TABLE_NAME,
+                new String[]{DEVICE_NAME_KEY,
+                        DEVICE_ID_KEY,
+                        DEVICE_CREDENTIALS_KEY},
+                DEVICE_ID_KEY + " = ?",
+                new String[]{String.valueOf(cursor.getInt(5))},
+                null, null, null);
+
+        if (cc_cursor.getCount() == 0) {
+            cc_cursor.close();
+            return null;
+        }
+
+        cc.setDeviceName(cc_cursor.getString(0));
+        cc.setDeviceId(cc_cursor.getInt(1));
+        cc.setCredentials(cc_cursor.getString(2));
+
+        Sensor snr = new Sensor(cc, mContext);
+        snr.setSensorId(cursor.getInt(0));
+        snr.setSensorName(cursor.getString(1));
+        snr.setSensorType(Sensor.convertIntToType(cursor.getInt(2)));
+        snr.setLastUpdateDate(cursor.getInt(3));
+        snr.setSensorCachedValue(cursor.getString(4));
+        snr.setTriggerString(cursor.getString(6)); // 5 is parent control id
+
+        return snr;
     }
 
     /**

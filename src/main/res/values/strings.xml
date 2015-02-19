@@ -25,8 +25,12 @@
     <string name="menu_view_history">View History</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_remove">Remove</string>
-    <string name="text_loading">Refreshing...</string>
+    <string name="text_loading">Refreshing…</string>
     <string name="dialog_title_edit_controller">Edit Controller</string>
     <string name="dialog_title_rename_sensor">Rename sensor</string>
+    <string name="title_activity_sensor_history">Sensor History</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="toast_error_loading_history">Error loading sensor history!</string>
+    <string name="toast_error_renaming_sensor">Error uploading new name. Change will be kept local.</string>
 
 </resources>

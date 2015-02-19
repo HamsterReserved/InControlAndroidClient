@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * 储存一个传感器的信息，并可以查询其值（还能干嘛……）
@@ -27,6 +28,46 @@ public class Sensor {
         SENSOR_UNKNOWN
     }
 
+    public static class SensorHistory {
+        private Date ValueDate;
+        private int Value;
+
+        SensorHistory(Date date, int value) {
+            ValueDate = date;
+            Value = value;
+        }
+
+        /**
+         * @param date Needs to be Unix timestamp (seconds) not Java's milliseconds!
+         */
+        SensorHistory(Long date, int value) {
+            ValueDate = new Date(date * 1000);
+            Value = value;
+        }
+
+        public Date getValueDate() {
+            return ValueDate;
+        }
+
+        public void setValueDate(Date valueDate) {
+            ValueDate = valueDate;
+        }
+
+        /**
+         * @param valueDate Needs to be Unix timestamp (seconds) not Java's milliseconds!
+         */
+        public void setValueDate(long valueDate) {
+            ValueDate = new java.util.Date(valueDate * 1000);
+        }
+
+        public int getValue() {
+            return Value;
+        }
+
+        public void setValue(int value) {
+            Value = value;
+        }
+    }
     /**
      * 默认的无效传感器ID，表明此实例还没有初始化
      */
@@ -99,7 +140,11 @@ public class Sensor {
      * @param mSensorName 目标传感器名称
      */
     public void setSensorName(String mSensorName) {
-        this.setSensorName(mSensorName, false);
+        try {
+            this.setSensorName(mSensorName, false);
+        } catch (IOException e) {
+            // If the 2nd param is false, it won't cause any exception.
+        }
     }
 
     public void setSensorCachedValue(String mSensorCachedValue) {
@@ -127,17 +172,15 @@ public class Sensor {
      * @param mSensorName 新的传感器名称
      * @param upload      是否上传到控制中心储存
      */
-    public void setSensorName(String mSensorName, boolean upload) {
+    public boolean setSensorName(String mSensorName, boolean upload) throws IOException {
         this.mSensorName = mSensorName;
-        if (this.isInfoComplete())
+        if (this.isInfoComplete()) {
             this.saveToDatabase(); // We are *changing* name, not just initializing
-        if (upload) {
-            if (this.isInfoComplete()) {
-                // TODO Upload to control center
-            } else {
-                throw new IllegalArgumentException("Sensor ID is not defined!");
+            if (upload) {
+                return NetworkAccessor.uploadSensorName(this);
             }
         }
+        return true;
     }
 
     public ControlCenter getParentControlCenter() {
@@ -154,7 +197,22 @@ public class Sensor {
     }
 
     public void setTriggerString(String mTriggers) {
-        this.mTriggers = mTriggers;
+        try {
+            setTriggerString(mTriggers, false);
+        } catch (IOException e) {
+            // False won't cause exception
+        }
+    }
+
+    public boolean setTriggerString(String mTriggerString, boolean upload) throws IOException {
+        this.mTriggers = mTriggerString;
+        if (this.isInfoComplete()) {
+            this.saveToDatabase();
+            if (upload) {
+                return NetworkAccessor.uploadSensorTrigger(this);
+            }
+        }
+        return true;
     }
 
     public boolean isInfoComplete() {

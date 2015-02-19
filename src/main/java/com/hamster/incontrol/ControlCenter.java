@@ -58,7 +58,19 @@ public class ControlCenter {
     }
 
     public void setDeviceName(String device_name) {
+        try {
+            this.setDeviceName(device_name, false);
+        } catch (Exception e) {
+            // Won't cause exception if 2nd param is false
+        }
+    }
+
+    public boolean setDeviceName(String device_name, boolean upload) throws IOException, JSONException {
         this.device_name = device_name;
+        if (this.isInfoComplete() && upload) {
+            return NetworkAccessor.uploadDeviceName(this);
+        }
+        return true;
     }
 
     public Sensor[] getSensors() {

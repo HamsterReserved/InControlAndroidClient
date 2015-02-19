@@ -29,6 +29,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.hamster.incontrol.MainActivity" />
         </activity>
+        <activity
+            android:name=".SensorHistoryActivity"
+            android:label="@string/title_activity_sensor_history"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.hamster.incontrol.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainActivity extends Activity {
 
@@ -172,9 +173,7 @@ public class MainActivity extends Activity {
                     });
                     return null; // We don't want incomplete data to go through. Just show cached.
                 }
-                for (Sensor snr : cc.getSensors()) {
-                    snr_list.add(snr);
-                }
+                Collections.addAll(snr_list, cc.getSensors());
             }
 
             // Sensor ret_snr[] = snr_list.toArray()

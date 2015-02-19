@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.Set;
  * <p/>
  * 用来从云端读取主机数据的类
  */
-public class NetworkAccessor {
+class NetworkAccessor {
     private static final String LOG_TAG = "InControl_NA";
     /**
      * API地址
@@ -88,6 +89,8 @@ public class NetworkAccessor {
     private static final String URL_REQUEST_TYPE_KEY = "request_type";
     private static final String URL_SENSOR_NAME_KEY = "name"; // Not sensor_name !
     private static final String URL_DEVICE_NAME_KEY = "name"; // Same as above
+    private static final String URL_SENSOR_TRIGGER_KEY = "trigger";
+    private static final String URL_COUNT_KEY = "count";
 
     /**
      * @deprecated PHP端已改为直接返回带数据的列表
@@ -153,7 +156,7 @@ public class NetworkAccessor {
      * @return true=成功 false=失败
      */
     public static boolean uploadDeviceName(ControlCenter cc) throws IOException {
-        Map<String, String> paramMap = new HashMap<>(5);
+        Map<String, String> paramMap = new HashMap<>(4);
         paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(cc.getDeviceId()));
         paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
         paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_NAME));
@@ -163,8 +166,32 @@ public class NetworkAccessor {
             JSONObject json = new JSONObject(getHttpReturnString(paramMap));
             if (json.getString("result").equals("ok"))
                 return true;
-        } catch (JSONException e) { // No such key
+        } catch (JSONException e) { // No such key. No need to throw an exception. Just return false
             Log.e(LOG_TAG, "updateSensorName failed with JSON exp: " + e.getLocalizedMessage());
+        }
+        return false;
+    }
+
+    /**
+     * 上传传感器的触发器到服务器
+     *
+     * @param snr 已经改过触发器的Sensor实例（可以用Trigger类的toString）
+     * @return true=成功 false=失败
+     */
+    public static boolean uploadSensorTrigger(Sensor snr) throws IOException {
+        Map<String, String> paramMap = new HashMap<>(5);
+        paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(snr.getParentControlCenter().getDeviceId()));
+        paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
+        paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_TRIGGER));
+        paramMap.put(URL_SENSOR_TRIGGER_KEY, snr.getTriggerString());
+        paramMap.put(URL_SENSOR_ID_KEY, String.valueOf(snr.getSensorId()));
+
+        try {
+            JSONObject json = new JSONObject(getHttpReturnString(paramMap));
+            if (json.getString("result").equals("ok"))
+                return true;
+        } catch (JSONException e) { // No such key. No need to throw an exception. Just return false
+            Log.e(LOG_TAG, "uploadSensorTrigger failed with JSON exp: " + e.getLocalizedMessage());
         }
         return false;
     }
@@ -185,6 +212,42 @@ public class NetworkAccessor {
             Log.e(LOG_TAG, "loadDeviceInfo failed with JSON exp: " + e.getLocalizedMessage());
         }
         return false;
+    }
+
+    public static ArrayList<Sensor.SensorHistory> loadSensorHistory(Sensor snr, int count) throws IOException {
+        if (snr.getSensorId() == Sensor.INVALID_SENSOR_ID) return null;
+
+        Map<String, String> paramMap = new HashMap<>(5);
+        paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(snr.getParentControlCenter().getDeviceId()));
+        paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
+        paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_QUERY_SENSOR_HISTORY));
+        paramMap.put(URL_SENSOR_ID_KEY, String.valueOf(snr.getSensorId()));
+        paramMap.put(URL_COUNT_KEY, String.valueOf(count));
+
+        try {
+            String retStr = getHttpReturnString(paramMap);
+            if (retStr.charAt(0) == '[') { // Array
+                JSONArray jsonArray = new JSONArray(retStr);
+                ArrayList<Sensor.SensorHistory> list = new ArrayList<>(jsonArray.length());
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    list.add(new Sensor.SensorHistory(
+                            jsonArray.getJSONObject(i).getLong(JSON_SENSOR_DATE_KEY),
+                            jsonArray.getJSONObject(i).getInt(JSON_SENSOR_VALUE_KEY)));
+                }
+                return list;
+            } else if (retStr.charAt(0) == '{') { // Object (only one entry)
+                ArrayList<Sensor.SensorHistory> list = new ArrayList<>(1);
+                JSONObject jsonObject = new JSONObject(retStr);
+                list.add(new Sensor.SensorHistory(
+                        jsonObject.getLong(JSON_SENSOR_DATE_KEY),
+                        jsonObject.getInt(JSON_SENSOR_VALUE_KEY)
+                ));
+                return list;
+            }
+        } catch (JSONException e) { // No such key
+            Log.e(LOG_TAG, "loadSensorHistory failed with JSON exp: " + e.getLocalizedMessage());
+        }
+        return null;
     }
 
     private static String buildUrlWithParams(Map map) {

@@ -16,7 +16,7 @@
     <string name="button_ok">确定</string>
     <string name="dialog_title_add_new_center">添加新的InControl控制器</string>
     <string name="current_value">当前值：</string>
-    <string name="toast_error_loading_sensors">传感器数据加载出错！</string>
+    <string name="toast_error_loading_sensors">传感器信息加载出错！</string>
     <string name="def_device_id">设备ID</string>
     <string name="menu_edit">编辑</string>
     <string name="menu_remove">删除</string>
@@ -26,4 +26,7 @@
     <string name="text_loading">正在刷新……</string>
     <string name="dialog_title_edit_controller">编辑控制器</string>
     <string name="dialog_title_rename_sensor">重命名传感器</string>
+    <string name="title_activity_sensor_history">传感器历史记录</string>
+    <string name="toast_error_loading_history">传感器历史数据加载出错！</string>
+    <string name="toast_error_renaming_sensor">上传新名称时出错，名称的变化将仅显示在本地。</string>
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
@@ -24,7 +25,8 @@
         android:layout_below="@id/tv_control_center_name"
         android:text="ID: "
         android:textColor="@android:color/tertiary_text_dark"
-        android:textSize="@dimen/text_size_secondary_text" />
+        android:textSize="@dimen/text_size_secondary_text"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/tv_control_center_id"
