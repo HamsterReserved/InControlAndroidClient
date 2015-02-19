@@ -17,6 +17,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class SensorHistoryActivity extends Activity {
@@ -68,6 +69,8 @@ public class SensorHistoryActivity extends Activity {
         GraphView graph = (GraphView) findViewById(R.id.graph);
 
         DataPoint points[] = new DataPoint[list.size()];
+        Collections.sort(list);
+
         for (int i = 0; i < points.length; i++) {
             points[i] = new DataPoint(
                     list.get(i).getValueDate().getTime(),

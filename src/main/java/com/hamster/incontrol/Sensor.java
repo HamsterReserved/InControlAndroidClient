@@ -32,7 +32,7 @@ public class Sensor {
         SENSOR_UNKNOWN
     }
 
-    public static class SensorHistory {
+    public static class SensorHistory implements Comparable<SensorHistory> {
         private Date ValueDate;
         private int Value;
 
@@ -47,6 +47,16 @@ public class Sensor {
         SensorHistory(Long date, int value) {
             ValueDate = new Date(date * 1000);
             Value = value;
+        }
+
+        @Override
+        public int compareTo(SensorHistory another) {
+            if (ValueDate.equals(another.getValueDate()))
+                return 0;
+            else if (ValueDate.getTime() > another.getValueDate().getTime())
+                return 1;
+            else
+                return -1;
         }
 
         public Date getValueDate() {
