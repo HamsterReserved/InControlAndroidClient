@@ -76,6 +76,7 @@ class NetworkAccessor {
     public static final String JSON_SENSOR_TYPE_KEY = "sensor_type";
     public static final String JSON_SENSOR_VALUE_KEY = "sensor_value";
     public static final String JSON_SENSOR_DATE_KEY = "sensor_date";
+    public static final String JSON_SENSOR_TRIGGER_KEY = "sensor_trigger";
 
     private static final String JSON_DEVICE_ID_KEY = "device_id";
     private static final String JSON_DEVICE_NAME_KEY = "device_name";
@@ -93,11 +94,10 @@ class NetworkAccessor {
     private static final String URL_COUNT_KEY = "count";
 
     /**
-     * @deprecated PHP端已改为直接返回带数据的列表
-     *
      * @param sensor_id 传感器ID
      * @return 此传感器数据的JSON对象
      * 更新指定传感器的值
+     * @deprecated PHP端已改为直接返回带数据的列表
      */
     public static JSONObject fetchSensorInfoJSON(int sensor_id, ControlCenter device) throws IOException, JSONException {
         Log.v(LOG_TAG, "fetchSensorInfoJSON() entered");

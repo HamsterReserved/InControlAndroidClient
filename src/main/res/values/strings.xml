@@ -32,5 +32,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="toast_error_loading_history">Error loading sensor history!</string>
     <string name="toast_error_renaming_sensor">Error uploading new name. Change will be kept local.</string>
+    <string name="title_history_of">History of </string>
 
 </resources>

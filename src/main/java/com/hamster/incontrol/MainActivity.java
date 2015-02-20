@@ -162,6 +162,7 @@ public class MainActivity extends Activity {
                     cc.updateSensors();
                 } catch (final Exception e) {
                     Log.e(TAG, "updateSensors encountered error! Msg:" + e.getLocalizedMessage());
+                    e.printStackTrace();
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {

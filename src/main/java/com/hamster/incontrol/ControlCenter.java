@@ -1,6 +1,7 @@
 package com.hamster.incontrol;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.hamster.incontrol.NetworkBackgroundOperator.BackgroundTaskDesc;
@@ -19,6 +20,7 @@ public class ControlCenter {
     public static final int INVALID_DEVICE_ID = -1;
     public static final int INVALID_DATE = -1;
 
+    private static final String TAG = "InControl_CC";
     /**
      * 主机序列号（用int真的好么？）
      */
@@ -156,6 +158,7 @@ public class ControlCenter {
             sensors[i].setSensorName(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_NAME_KEY));
             sensors[i].setSensorCachedValue(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_VALUE_KEY));
             sensors[i].setLastUpdateDate(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_DATE_KEY));
+            sensors[i].setTriggerString(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_TRIGGER_KEY));
             sensors[i].saveToDatabase();
         }
     }

@@ -63,23 +63,8 @@ public class Sensor {
             return ValueDate;
         }
 
-        public void setValueDate(Date valueDate) {
-            ValueDate = valueDate;
-        }
-
-        /**
-         * @param valueDate Needs to be Unix timestamp (seconds) not Java's milliseconds!
-         */
-        public void setValueDate(long valueDate) {
-            ValueDate = new java.util.Date(valueDate * 1000);
-        }
-
         public int getValue() {
             return Value;
-        }
-
-        public void setValue(int value) {
-            Value = value;
         }
     }
 
@@ -106,7 +91,7 @@ public class Sensor {
     private long mLastUpdateDate;
     private ControlCenter mParentControlCenter;
     private Context mContext;
-    private String mTriggers; // 注意这个没在sensor list里，要自己获取才可以
+    private Trigger mTrigger;
 
     /**
      * @param parent_cc 所属ControlCenter
@@ -221,7 +206,7 @@ public class Sensor {
 
 
     public String getTriggerString() {
-        return mTriggers;
+        return mTrigger.toString();
     }
 
     public void setTriggerString(String mTriggers) {
@@ -233,7 +218,7 @@ public class Sensor {
     }
 
     public boolean setTriggerString(String mTriggerString, boolean upload) throws IOException {
-        this.mTriggers = mTriggerString;
+        mTrigger = new Trigger(mContext, mTriggerString, this);
         if (this.isInfoComplete()) {
             this.saveToDatabase();
             if (upload) {
@@ -263,12 +248,11 @@ public class Sensor {
     }
 
     /**
-     * @param na 已初始化有HomeDevice的NetworkAccessor实例
      * @throws IOException   网络错误
      * @throws JSONException JSON格式错误
      * @deprecated 查询指定传感器信息（不知道这是干嘛的，明明在ControlCenter已经有了刷新列表的功能）
      */
-    public void update(NetworkAccessor na) throws IOException, JSONException {
+    public void update() throws IOException, JSONException {
         if (this.isInfoComplete()) {
             JSONObject json;
 
