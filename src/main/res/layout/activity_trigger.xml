@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/list_cond"
         android:divider="@android:color/transparent"
-        android:dividerHeight="10dp" />
+        android:dividerHeight="10dp"
+        android:paddingBottom="16dp" />
 
     <!-- Divider line -->
     <View
@@ -25,5 +26,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/list_act"
         android:divider="@android:color/transparent"
-        android:dividerHeight="10dp" />
+        android:dividerHeight="10dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp" />
 </LinearLayout>

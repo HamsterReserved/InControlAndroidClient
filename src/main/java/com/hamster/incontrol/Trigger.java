@@ -51,7 +51,7 @@ class Trigger {
         }
     }
 
-    public class Action {
+    public class Action implements Describable {
         private String mActionTarget; // Receiver phone number / target sensor(switch) ID etc
         private String mActionContent; // "Your house is on fire" etc
         private ActionType mActionType;
@@ -110,6 +110,7 @@ class Trigger {
             return String.valueOf(mActionType.ordinal()) + "," + mActionTarget + "," + mActionContent;
         }
 
+        @Override
         public String getDescription() {
             switch (mActionType) {
                 case ACTION_SHOW_NOTIFICATION:
@@ -128,7 +129,7 @@ class Trigger {
      * Note that this should be implemented in Center device as well.
      * Phone only shows a notification.
      */
-    public class Condition {
+    public class Condition implements Describable {
         private ConditionType mCondition;
         private String mComparingValue; // percents(with %, use the sensor below) or literal (w/o %)
         private Sensor mOriginatingSensor;
@@ -233,6 +234,7 @@ class Trigger {
                     + String.valueOf(mSensorToCompare.getSensorId());
         }
 
+        @Override
         public String getDescription() {
             switch (mCondition) {
                 case COND_EQUAL:

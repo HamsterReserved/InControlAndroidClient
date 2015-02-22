@@ -252,13 +252,19 @@ class LocalConfigStore {
         return sensors;
     }
 
+    public Sensor getSensorById(int sensor_id) {
+        return getSensorById(sensor_id, false);
+    }
+
     /**
      * The long-waited function is finally here!
      *
-     * @param sensor_id to query
+     * @param sensor_id       to query
+     * @param require_trigger Whether trigger info should be fetched. DO NOT ENABLE in Trigger related things
+     *                        because this can cause a loop (setTriggerString -> (Init) -> this function)
      * @return the found sensor
      */
-    public Sensor getSensorById(int sensor_id) {
+    public Sensor getSensorById(int sensor_id, boolean require_trigger) {
         if (sensor_id == Sensor.INVALID_SENSOR_ID) return null;
 
         Cursor cursor = db.query(SENSORS_TABLE_NAME,
@@ -305,7 +311,8 @@ class LocalConfigStore {
         snr.setSensorType(Sensor.convertIntToType(cursor.getInt(2)));
         snr.setLastUpdateDate(cursor.getInt(3));
         snr.setSensorCachedValue(cursor.getString(4));
-        snr.setTriggerString(cursor.getString(6)); // 5 is parent control id
+        if (require_trigger)
+            snr.setTriggerString(cursor.getString(6)); // 5 is parent control id
 
         cursor.close();
         return snr;

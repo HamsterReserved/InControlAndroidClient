@@ -8,15 +8,14 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 /**
  * Created by Hamster on 2015/2/22.
  * Base class for listing actions and conditions
  */
-public class TriggerListBaseAdapter<E> extends BaseAdapter {
-    private ArrayList<E> mList;
+public class TriggerListBaseAdapter extends BaseAdapter {
+    private ArrayList<Describable> mList;
     private Context mContext;
 
     TriggerListBaseAdapter(Context ctx) {
@@ -24,15 +23,15 @@ public class TriggerListBaseAdapter<E> extends BaseAdapter {
         mList = new ArrayList<>();
     }
 
-    public void addItem(E item) {
+    public void addItem(Describable item) {
         mList.add(item);
     }
 
-    public void addAllItems(E[] items) {
+    public void addAllItems(Describable[] items) {
         Collections.addAll(mList, items);
     }
 
-    public void addAllItems(ArrayList<E> items) {
+    public void addAllItems(ArrayList<Describable> items) {
         mList.addAll(items);
     }
 
@@ -58,9 +57,12 @@ public class TriggerListBaseAdapter<E> extends BaseAdapter {
             convertView = li.inflate(R.layout.text_in_card_view, null);
         }
         TextView tv = (TextView) convertView.findViewById(R.id.tv_text_in_card);
-        tv.setText(mList.get(position).toString());
+        tv.setText(mList.get(position).getDescription());
 
         return convertView;
     }
 
+    public void clearAll() {
+        mList.clear();
+    }
 }
