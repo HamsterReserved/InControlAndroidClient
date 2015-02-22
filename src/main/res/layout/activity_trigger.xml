@@ -9,7 +9,7 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:id="@+id/list_cond"
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
@@ -23,7 +23,7 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/list_act"
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"

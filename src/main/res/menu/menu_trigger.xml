@@ -2,8 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.hamster.incontrol.ControlCenterActivity">
     <item
-        android:id="@+id/action_trigger_add"
-        android:icon="@drawable/ic_menu_add"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_control_center_add" />
+        android:id="@+id/action_condition_add"
+        android:showAsAction="never"
+        android:title="Add Condition"></item>
+    <item
+        android:id="@+id/action_action_add"
+        android:showAsAction="never"
+        android:title="Add Action"></item>
 </menu>
