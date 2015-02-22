@@ -29,12 +29,12 @@ class LocalConfigStore {
     private static final String DEVICE_NAME_KEY = "device_name";
     private static final String DEVICE_CREDENTIALS_KEY = "user_credentials";
     private static final String SENSOR_ID_KEY = "sensor_id"; // sensors table
-    private static final String SENSOR_NAME_KEY = "sensor_name";
-    private static final String SENSOR_TYPE_KEY = "sensor_type";
-    private static final String SENSOR_CACHED_VALUE_KEY = "sensor_cached_value";
-    private static final String SENSOR_UPDATE_DATE_KEY = "sensor_update_date";
-    private static final String SENSOR_PARENT_CONTROL_ID_KEY = "sensor_parent_control_id";
-    private static final String SENSOR_TRIGGER_KEY = "sensor_trigger";
+    private static final String SENSOR_NAME_KEY = "name";
+    private static final String SENSOR_TYPE_KEY = "type";
+    private static final String SENSOR_CACHED_VALUE_KEY = "value";
+    private static final String SENSOR_UPDATE_DATE_KEY = "date";
+    private static final String SENSOR_PARENT_CONTROL_ID_KEY = "control_id";
+    private static final String SENSOR_TRIGGER_KEY = "trigger";
 
     private Context mContext;
     private DatabaseHelper dbhelper;
@@ -172,6 +172,7 @@ class LocalConfigStore {
         cv.put(SENSOR_UPDATE_DATE_KEY, snr.getLastUpdateDate());
         cv.put(SENSOR_CACHED_VALUE_KEY, snr.getSensorCachedValue());
         cv.put(SENSOR_PARENT_CONTROL_ID_KEY, snr.getParentControlCenter().getDeviceId());
+        cv.put(SENSOR_TRIGGER_KEY, snr.getTriggerString());
 
         result |= db.update(SENSORS_TABLE_NAME, cv,
                 SENSOR_ID_KEY + " = ?",
@@ -258,6 +259,8 @@ class LocalConfigStore {
      * @return the found sensor
      */
     public Sensor getSensorById(int sensor_id) {
+        if (sensor_id == Sensor.INVALID_SENSOR_ID) return null;
+
         Cursor cursor = db.query(SENSORS_TABLE_NAME,
                 new String[]{SENSOR_ID_KEY,
                         SENSOR_NAME_KEY,
@@ -304,6 +307,7 @@ class LocalConfigStore {
         snr.setSensorCachedValue(cursor.getString(4));
         snr.setTriggerString(cursor.getString(6)); // 5 is parent control id
 
+        cursor.close();
         return snr;
     }
 
@@ -327,12 +331,12 @@ class LocalConfigStore {
                 "user_credentials text)";
         private String CREATE_TABLE_SENSORS = "CREATE TABLE sensors(" +
                 "sensor_id integer, " +
-                "sensor_type integer," +
-                "sensor_name text," +
-                "sensor_cached_value text," +
-                "sensor_update_date integer," +
-                "sensor_parent_control_id integer," +
-                "sensor_trigger text)";
+                "type integer," +
+                "name text," +
+                "value text," +
+                "date integer," +
+                "control_id integer," +
+                "trigger text)";
 
         DatabaseHelper(Context context) {
             super(context, DEFAULT_DB_FILENAME, null, DB_VERSION);

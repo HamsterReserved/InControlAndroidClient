@@ -128,6 +128,8 @@ public class MainActivity extends Activity {
             mListAdapter.addToSensors(lcs.getSensors(cc));
         }
         mListAdapter.reloadDataWithEmptyView(mEmptyView);
+
+        lcs.close();
     }
 
     public Handler getHandler() {
@@ -155,6 +157,7 @@ public class MainActivity extends Activity {
             ArrayList<Sensor> snr_list = new ArrayList<Sensor>();
             LocalConfigStore lcs = new LocalConfigStore(getApplicationContext());
             final ControlCenter[] ccs = lcs.getControlCenters(); // This is local only
+            lcs.close();
 
             if (ccs == null) return null;
             for (ControlCenter cc : ccs) {

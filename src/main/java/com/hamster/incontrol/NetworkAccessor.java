@@ -30,7 +30,7 @@ class NetworkAccessor {
      * API地址
      */
     //public static final String INCONTROL_API_URL = "http://incontrol.sinaapp.com/incontrol_api.php";
-    public static final String INCONTROL_API_URL = "http://192.168.137.1/incontrol/incontrol/incontrol_api.php";
+    public static final String INCONTROL_API_URL = "http://192.168.43.2/incontrol/incontrol/incontrol_api.php";
 
     /**
      * 设备类型，这个数值应与PHP保持一致，不能修改

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -44,12 +45,23 @@ class DeviceListViewAdapter extends BaseAdapter {
                         .getText().toString());
 
                 pop.getMenuInflater().inflate(R.menu.menu_sensor_overflow, pop.getMenu());
+                pop.getMenu().getItem(0).setOnMenuItemClickListener(menuTriggerOnClickListener);
+                pop.getMenu().getItem(0).setIntent(intentDummy);
                 pop.getMenu().getItem(1).setOnMenuItemClickListener(menuRenameOnClickListener);
                 pop.getMenu().getItem(1).setIntent(intentDummy);
                 pop.getMenu().getItem(2).setOnMenuItemClickListener(menuShowHistoryOnClickListener);
                 pop.getMenu().getItem(2).setIntent(intentDummy);
                 pop.show();
             }
+        }
+    };
+
+    private MenuItem.OnMenuItemClickListener menuTriggerOnClickListener = new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            item.getIntent().setClass(mContext, TriggerActivity.class);
+            mContext.startActivity(item.getIntent()); // ID info is already in the intent
+            return true;
         }
     };
 

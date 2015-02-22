@@ -71,6 +71,7 @@ public class SensorHistoryActivity extends Activity {
             LocalConfigStore lcs = new LocalConfigStore(this);
             int sensor_id = this.getIntent().getIntExtra("id", Sensor.INVALID_SENSOR_ID);
             Sensor snr = lcs.getSensorById(sensor_id);
+            lcs.close();
 
             task.execute(snr);
             this.setTitle(getResources().getString(R.string.title_history_of) + " "

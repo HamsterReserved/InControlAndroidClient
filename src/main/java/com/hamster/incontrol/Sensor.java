@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * 储存一个传感器的信息，并可以查询其值（还能干嘛……）
  */
-public class Sensor {
+class Sensor {
 
     /******************常量和内部枚举********************/
 
@@ -100,6 +100,7 @@ public class Sensor {
         super();
         this.mParentControlCenter = parent_cc;
         this.mContext = ctx;
+        this.mTrigger = new Trigger(mContext, "", this); // To avoid NPE
     }
 
     public static SensorType convertIntToType(int conv) {
@@ -174,24 +175,22 @@ public class Sensor {
      */
     public boolean setSensorName(String mSensorName, boolean upload) throws IOException {
         this.mSensorName = mSensorName;
-        if (this.isInfoComplete()) {
+        if (this.isInfoComplete() && upload) {
             this.saveToDatabase(); // We are *changing* name, not just initializing
-            if (upload) {
-                BackgroundTaskDesc task =
-                        new BackgroundTaskDesc(Operation.OPERATION_RENAME_SENSOR,
-                                this,
-                                null,
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(mContext,
-                                                mContext.getResources().getString(R.string.toast_error_renaming_sensor),
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                NetworkBackgroundOperator op = new NetworkBackgroundOperator(task);
-                op.execute();
-            }
+            BackgroundTaskDesc task =
+                    new BackgroundTaskDesc(Operation.OPERATION_RENAME_SENSOR,
+                            this,
+                            null,
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(mContext,
+                                            mContext.getResources().getString(R.string.toast_error_renaming_sensor),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+            NetworkBackgroundOperator op = new NetworkBackgroundOperator(task);
+            op.execute();
         }
         return true;
     }
@@ -218,10 +217,10 @@ public class Sensor {
     }
 
     public boolean setTriggerString(String mTriggerString, boolean upload) throws IOException {
-        mTrigger = new Trigger(mContext, mTriggerString, this);
-        if (this.isInfoComplete()) {
-            this.saveToDatabase();
-            if (upload) {
+        if (mTriggerString != null && !mTriggerString.equals("")) {
+            mTrigger = new Trigger(mContext, mTriggerString, this);
+            if (this.isInfoComplete() && upload) {
+                this.saveToDatabase();
                 BackgroundTaskDesc task =
                         new BackgroundTaskDesc(Operation.OPERATION_UPLOAD_SENSOR_TRIGGER,
                                 this,

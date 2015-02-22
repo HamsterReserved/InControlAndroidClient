@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
 public class ControlCenterActivity extends Activity {
@@ -87,7 +88,12 @@ public class ControlCenterActivity extends Activity {
                 EditText et_cc_cred = (EditText) alertDialog.findViewById(R.id.et_control_cred);
 
                 ControlCenter cc = new ControlCenter(getApplicationContext());
-                cc.setDeviceId(Integer.parseInt(et_cc_id.getText().toString()));
+                try {
+                    cc.setDeviceId(Integer.parseInt(et_cc_id.getText().toString()));
+                } catch (NumberFormatException e) {
+                    Toast.makeText(mContext, "Device ID format error!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 // -1 if null, which is exactly INVAILD_SENSOR_ID
                 cc.setDeviceName(et_cc_name.getText().toString());
                 cc.setCredentials(et_cc_cred.getText().toString());

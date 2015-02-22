@@ -52,7 +52,7 @@ class Trigger {
     }
 
     public class Action {
-        private String mActionTarget; // Receiver phone number etc
+        private String mActionTarget; // Receiver phone number / target sensor(switch) ID etc
         private String mActionContent; // "Your house is on fire" etc
         private ActionType mActionType;
 
@@ -63,7 +63,7 @@ class Trigger {
         }
 
         Action(String savedString) {
-            String[] strs = savedString.split(":");
+            String[] strs = savedString.split(",");
 
             this.mActionType = convertIntToActionType(Integer.parseInt(strs[0]));
             this.mActionTarget = strs[1];
@@ -107,7 +107,20 @@ class Trigger {
 
         @Override
         public String toString() {
-            return String.valueOf(mActionType.ordinal()) + ":" + mActionTarget + ":" + mActionContent;
+            return String.valueOf(mActionType.ordinal()) + "," + mActionTarget + "," + mActionContent;
+        }
+
+        public String getDescription() {
+            switch (mActionType) {
+                case ACTION_SHOW_NOTIFICATION:
+                    return "Show a notification";
+                case ACTION_SEND_SMS:
+                    return "Send a message to " + mActionTarget + " saying " + mActionContent;
+                case ACTION_TRIGGER_SENSOR:
+                    return "Toggle switch (ID) " + mActionTarget;
+                default:
+                    return "";
+            }
         }
     }
 
@@ -123,7 +136,7 @@ class Trigger {
 
         Condition(String initString) {
             LocalConfigStore lcs = new LocalConfigStore(mContext);
-            String[] strs = initString.split(":");
+            String[] strs = initString.split(",");
 
             mCondition = convertIntToConditionType(Integer.parseInt(strs[0]));
             mComparingValue = strs[1];
@@ -214,29 +227,50 @@ class Trigger {
         public String toString() {
             if (mOriginatingSensor == null || mSensorToCompare == null)
                 return ""; // Incomplete or wrong info. null is shown as "null"
-            return String.valueOf(mCondition.ordinal()) + ":"
-                    + mComparingValue + ":"
-                    + String.valueOf(mOriginatingSensor.getSensorId()) + ":"
+            return String.valueOf(mCondition.ordinal()) + ","
+                    + mComparingValue + ","
+                    + String.valueOf(mOriginatingSensor.getSensorId()) + ","
                     + String.valueOf(mSensorToCompare.getSensorId());
+        }
+
+        public String getDescription() {
+            switch (mCondition) {
+                case COND_EQUAL:
+                    return "When value of " + mOriginatingSensor.getSensorName() + " is equal to "
+                            + mSensorToCompare.getSensorName();
+                case COND_SMALLER_THAN:
+                    return "When value of " + mOriginatingSensor.getSensorName() + " is smaller than "
+                            + mSensorToCompare.getSensorName();
+                case COND_GREATER_THAN:
+                    return "When value of " + mOriginatingSensor.getSensorName() + " is greater than "
+                            + mSensorToCompare.getSensorName();
+                case COND_CHANGED_OUT_OF_RANGE:
+                    return "When value of " + mOriginatingSensor.getSensorName() + " has changed out of " +
+                            mComparingValue;
+                default:
+                    return "";
+            }
         }
     }
 
     Trigger(Context ctx, String initString, Sensor snr) {
+        this.mAssociatedSensor = snr;
+        mActions = new ArrayList<>();
+        mConditions = new ArrayList<>(); // Do these first to avoid NPE
+
         this.mContext = ctx;
         if (initString == null) return;
-        String[] strsCat = initString.split("\\|"); // Take care of this fxxing regex
+        String[] strsCat = initString.split("&"); // Take care of this fxxking regex
 
         if (strsCat.length == 1) { // Split error, original string is returned
-            mActions = new ArrayList<>(0);
-            mConditions = new ArrayList<>(0);
             return;
         }
 
         String[] conds = strsCat[0].split(";");
         String[] acts = strsCat[1].split(";");
 
-        mActions = new ArrayList<>(acts.length);
-        mConditions = new ArrayList<>(conds.length);
+        mActions.ensureCapacity(acts.length);
+        mConditions.ensureCapacity(conds.length);
 
         for (String cond : conds) {
             mConditions.add(new Condition(cond));
@@ -245,23 +279,32 @@ class Trigger {
         for (String act : acts) {
             mActions.add(new Action(act));
         }
+    }
 
-        this.mAssociatedSensor = snr;
+    Trigger(Context ctx, Sensor snr) {
+        this(ctx, snr.getTriggerString(), snr);
     }
 
     @Override
     public String toString() {
         String ret = "";
-        for (Condition cond : mConditions) {
-            ret = ret + cond.toString() + ";";
-        }
-        ret = ret.substring(0, ret.length() - 1); // Remove trailing ;
+        if (mConditions.size() != 0 && mActions.size() != 0) { // Otherwise it's not complete
+            for (Condition cond : mConditions) {
+                if (cond != null) {// I'm fed up with this. Invalid inputs are ignored, but left a null in array
+                    ret = ret + cond.toString() + ";";
+                }
+            }
+            ret = ret.substring(0, ret.length() - 1); // Remove trailing ;
 
-        for (Action act : mActions) {
-            ret = ret + act.toString() + ";";
-        }
-        ret = ret.substring(0, ret.length() - 1);
+            ret = ret + "&";
 
+            for (Action act : mActions) {
+                if (act != null) {
+                    ret = ret + act.toString() + ";";
+                }
+            }
+            ret = ret.substring(0, ret.length() - 1);
+        }
         return ret;
     }
 
@@ -274,5 +317,21 @@ class Trigger {
                     + " has satisified given conditions. Value is "
                     + String.valueOf(mAssociatedSensor.getSensorCachedValue()));
         }
+    }
+
+    public void addAction(Action act) {
+        mActions.add(act);
+    }
+
+    public void addCondition(Condition cond) {
+        mConditions.add(cond);
+    }
+
+    public ArrayList<Condition> getAllConditions() {
+        return mConditions;
+    }
+
+    public ArrayList<Action> getAllActions() {
+        return mActions;
     }
 }

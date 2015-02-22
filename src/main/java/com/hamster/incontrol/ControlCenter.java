@@ -16,7 +16,7 @@ import java.io.IOException;
  * Created by Hamster on 2015/1/11.
  * 描述一台主机
  */
-public class ControlCenter {
+class ControlCenter {
     public static final int INVALID_DEVICE_ID = -1;
     public static final int INVALID_DATE = -1;
 

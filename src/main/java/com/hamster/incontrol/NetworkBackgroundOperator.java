@@ -9,7 +9,7 @@ import java.io.IOException;
  * Created by Hamster on 2015/2/19.
  * 用来做与网络相关的AsyncTask，只支持判断返回为boolean型的
  */
-public class NetworkBackgroundOperator {
+class NetworkBackgroundOperator {
     private static final String TAG = "InContro_NetBG";
     private BackgroundTaskDesc mBGTaskDesc;
 

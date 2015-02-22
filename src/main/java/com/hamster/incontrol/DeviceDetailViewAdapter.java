@@ -19,7 +19,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DeviceDetailViewAdapter extends BaseAdapter {
+class DeviceDetailViewAdapter extends BaseAdapter {
 
     /**
      * Items in List

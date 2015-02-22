@@ -30,4 +30,6 @@
     <string name="toast_error_loading_history">传感器历史数据加载出错！</string>
     <string name="toast_error_renaming_sensor">上传新名称时出错，名称的变化将仅显示在本地。</string>
     <string name="title_history_of">传感器历史：</string>
+    <string name="title_activity_trigger">触发器</string>
+    <string name="title_trigger_of">触发器：</string>
 </resources>

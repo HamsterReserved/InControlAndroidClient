@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * Created by Hamster on 2015/2/20.
  * Same as the one in SensorHistoryActivity. I moved that here.
  */
-public class LoadHistoryTask extends AsyncTask<Sensor, Void, ArrayList<Sensor.SensorHistory>> {
+class LoadHistoryTask extends AsyncTask<Sensor, Void, ArrayList<Sensor.SensorHistory>> {
     private Context mContext;
     private Runnable mRunOnSuccess;
     private ArrayList<Sensor.SensorHistory> mResult;
