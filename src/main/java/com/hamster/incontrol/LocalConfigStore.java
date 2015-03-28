@@ -172,7 +172,7 @@ class LocalConfigStore {
         cv.put(SENSOR_UPDATE_DATE_KEY, snr.getLastUpdateDate());
         cv.put(SENSOR_CACHED_VALUE_KEY, snr.getSensorCachedValue());
         cv.put(SENSOR_PARENT_CONTROL_ID_KEY, snr.getParentControlCenter().getDeviceId());
-        cv.put(SENSOR_TRIGGER_KEY, snr.getTriggerString());
+        cv.put(SENSOR_TRIGGER_KEY, snr.getTriggerInstance().toString());
 
         result |= db.update(SENSORS_TABLE_NAME, cv,
                 SENSOR_ID_KEY + " = ?",

@@ -34,5 +34,11 @@
     <string name="title_history_of">History of </string>
     <string name="title_activity_trigger">Trigger</string>
     <string name="title_trigger_of">Trigger of </string>
+    <string name="when">When value </string>
+    <string name="comma">,</string>
+    <string name="menu_add_trigger">Add Trigger</string>
+    <string name="toast_error_upload_trigger">Trigger setting upload failed!</string>
+    <string name="menu_add_action">Add Action</string>
+    <string name="menu_add_condition">Add Condition</string>
 
 </resources>

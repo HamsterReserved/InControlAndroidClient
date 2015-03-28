@@ -74,7 +74,7 @@ public class ControlCenterActivity extends Activity {
         final LayoutInflater inflater =
                 (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
 
-        View layout = inflater.inflate(R.layout.control_center_edit_dialog, null);
+        View layout = inflater.inflate(R.layout.dialog_edit_control_center, null);
         builder = new AlertDialog.Builder(mContext);
         builder.setView(layout)
                 .setNegativeButton(res.getText(R.string.button_cancel), null)

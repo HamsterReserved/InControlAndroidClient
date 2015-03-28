@@ -32,4 +32,10 @@
     <string name="title_history_of">传感器历史：</string>
     <string name="title_activity_trigger">触发器</string>
     <string name="title_trigger_of">触发器：</string>
+    <string name="when">当值</string>
+    <string name="comma">时，</string>
+    <string name="menu_add_trigger">添加触发器</string>
+    <string name="toast_error_upload_trigger">上传传感器设置失败！</string>
+    <string name="menu_add_action">添加动作</string>
+    <string name="menu_add_condition">添加条件</string>
 </resources>

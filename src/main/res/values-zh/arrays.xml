@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="when">
+        <item>等于</item>
+        <item>大于</item>
+        <item>小于</item>
+        <item>变化率%大于</item>
+    </string-array>
+
+    <string-array name="action">
+        <item>显示通知</item>
+        <!-- <item>触发传感器</item> -->
+        <item>发送短信至</item>
+    </string-array>
+</resources>

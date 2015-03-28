@@ -80,7 +80,7 @@ class DeviceDetailViewAdapter extends BaseAdapter {
                     LayoutInflater.from(mContext);
 
             // Create the dialog
-            View layout = inflater.inflate(R.layout.control_center_edit_dialog, null);
+            View layout = inflater.inflate(R.layout.dialog_edit_control_center, null);
             builder = new AlertDialog.Builder(mContext);
             builder.setView(layout)
                     .setNegativeButton(res.getText(R.string.button_cancel), null)
@@ -167,7 +167,7 @@ class DeviceDetailViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null)
-            convertView = mInflater.inflate(R.layout.control_center_detail, null);
+            convertView = mInflater.inflate(R.layout.listitem_control_center_detail, null);
         TextView cc_name = (TextView) convertView.findViewById(R.id.tv_control_center_name);
         TextView cc_id = (TextView) convertView.findViewById(R.id.tv_control_center_id);
         ImageButton ib = (ImageButton) convertView.findViewById(R.id.device_popup_menu);

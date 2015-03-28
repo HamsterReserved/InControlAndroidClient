@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- These string arrays need to be keep in sync with id array -->
+    <string-array name="when">
+        <item>equals to</item>
+        <item>is greater than</item>
+        <item>is smaller than</item>
+        <item>changed out of (%)</item>
+    </string-array>
+
+    <string-array name="action">
+        <item>show notification</item>
+        <!-- <item>trigger sensor with ID</item> -->
+        <item>send SMS to</item>
+    </string-array>
+
+    <integer-array name="when_id">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </integer-array>
+
+    <integer-array name="action_id">
+        <item>0</item>
+        <!-- <item>1</item> -->
+        <item>2</item>
+    </integer-array>
+</resources>

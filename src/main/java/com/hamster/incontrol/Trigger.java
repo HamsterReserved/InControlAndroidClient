@@ -58,7 +58,7 @@ class Trigger {
 
         Action(String mActionTarget, String mActionContent, ActionType mActionType) {
             this.mActionTarget = mActionTarget;
-            this.mActionContent = mActionContent;
+            this.mActionContent = mActionContent; // Abandoned
             this.mActionType = mActionType;
         }
 
@@ -66,7 +66,7 @@ class Trigger {
             String[] strs = savedString.split(",");
 
             this.mActionType = convertIntToActionType(Integer.parseInt(strs[0]));
-            this.mActionTarget = strs[1];
+            this.mActionTarget = strs[1].equals("null") ? null : strs[1]; // "null" -> null
             this.mActionContent = strs[2];
         }
 
@@ -116,7 +116,8 @@ class Trigger {
                 case ACTION_SHOW_NOTIFICATION:
                     return "Show a notification";
                 case ACTION_SEND_SMS:
-                    return "Send a message to " + mActionTarget + " saying " + mActionContent;
+                    return "Send a message to " + mActionTarget +
+                            (mActionContent == null ? " saying " + mActionContent : "");
                 case ACTION_TRIGGER_SENSOR:
                     return "Toggle switch (ID) " + mActionTarget;
                 default:
@@ -133,7 +134,7 @@ class Trigger {
         private ConditionType mCondition;
         private String mComparingValue; // percents(with %, use the sensor below) or literal (w/o %)
         private Sensor mOriginatingSensor;
-        private Sensor mSensorToCompare;
+        private Sensor mSensorToCompare; // TODO Abandoned
 
         Condition(String initString) {
             LocalConfigStore lcs = new LocalConfigStore(mContext);
@@ -142,8 +143,14 @@ class Trigger {
             mCondition = convertIntToConditionType(Integer.parseInt(strs[0]));
             mComparingValue = strs[1];
             mOriginatingSensor = lcs.getSensorById(Integer.parseInt(strs[2]));
-            mSensorToCompare = lcs.getSensorById(Integer.parseInt(strs[3]));
+            // Abandoned mSensorToCompare = lcs.getSensorById(Integer.parseInt(strs[3]));
             lcs.close();
+        }
+
+        Condition(ConditionType type, String comparingValue, Sensor originatingSensor) {
+            this.mCondition = type;
+            this.mComparingValue = comparingValue;
+            this.mOriginatingSensor = originatingSensor;
         }
 
         private boolean isRelative() {
@@ -226,12 +233,13 @@ class Trigger {
 
         @Override
         public String toString() {
-            if (mOriginatingSensor == null || mSensorToCompare == null)
+            //if (mOriginatingSensor == null || mSensorToCompare == null)
+            if (mOriginatingSensor == null) // Abandoned
                 return ""; // Incomplete or wrong info. null is shown as "null"
             return String.valueOf(mCondition.ordinal()) + ","
                     + mComparingValue + ","
-                    + String.valueOf(mOriginatingSensor.getSensorId()) + ","
-                    + String.valueOf(mSensorToCompare.getSensorId());
+                    + String.valueOf(mOriginatingSensor.getSensorId()); // Abandoned // + ","
+            //+ String.valueOf(mSensorToCompare.getSensorId());
         }
 
         @Override
@@ -239,13 +247,13 @@ class Trigger {
             switch (mCondition) {
                 case COND_EQUAL:
                     return "When value of " + mOriginatingSensor.getSensorName() + " is equal to "
-                            + mSensorToCompare.getSensorName();
+                            + mComparingValue;
                 case COND_SMALLER_THAN:
                     return "When value of " + mOriginatingSensor.getSensorName() + " is smaller than "
-                            + mSensorToCompare.getSensorName();
+                            + mComparingValue;
                 case COND_GREATER_THAN:
                     return "When value of " + mOriginatingSensor.getSensorName() + " is greater than "
-                            + mSensorToCompare.getSensorName();
+                            + mComparingValue;
                 case COND_CHANGED_OUT_OF_RANGE:
                     return "When value of " + mOriginatingSensor.getSensorName() + " has changed out of " +
                             mComparingValue;
@@ -262,7 +270,7 @@ class Trigger {
 
         this.mContext = ctx;
         if (initString == null) return;
-        String[] strsCat = initString.split("&"); // Take care of this fxxking regex
+        String[] strsCat = initString.split("\\|"); // Take care of this fxxking regex
 
         if (strsCat.length == 1) { // Split error, original string is returned
             return;
@@ -284,7 +292,7 @@ class Trigger {
     }
 
     Trigger(Context ctx, Sensor snr) {
-        this(ctx, snr.getTriggerString(), snr);
+        this(ctx, snr.getTriggerInstance().toString(), snr);
     }
 
     @Override
@@ -298,7 +306,7 @@ class Trigger {
             }
             ret = ret.substring(0, ret.length() - 1); // Remove trailing ;
 
-            ret = ret + "&";
+            ret = ret + "|";
 
             for (Action act : mActions) {
                 if (act != null) {
@@ -335,5 +343,17 @@ class Trigger {
 
     public ArrayList<Action> getAllActions() {
         return mActions;
+    }
+
+    public Sensor getSensor() {
+        return mAssociatedSensor;
+    }
+
+    public void removeActionAt(int i) {
+        mActions.remove(i);
+    }
+
+    public void removeConditionAt(int i) {
+        mConditions.remove(i);
     }
 }

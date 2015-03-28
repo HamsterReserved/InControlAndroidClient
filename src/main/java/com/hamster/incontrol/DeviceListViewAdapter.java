@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -70,7 +69,7 @@ class DeviceListViewAdapter extends BaseAdapter {
         public boolean onMenuItemClick(MenuItem item) {
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
             LayoutInflater inflater = LayoutInflater.from(mContext);
-            View dialogView = inflater.inflate(R.layout.sensor_rename_dialog, null);
+            View dialogView = inflater.inflate(R.layout.dialog_rename_sensor, null);
             int sensorId = Integer.parseInt(item.getIntent().getStringExtra("id"));
             final Sensor matchSensor = findSensorById(sensorId);
 
@@ -163,7 +162,7 @@ class DeviceListViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null)
-            convertView = mInflater.inflate(R.layout.sensor_info_detail, null);
+            convertView = mInflater.inflate(R.layout.listitem_sensor_info_detail, null);
         TextView sensor_name = (TextView) convertView.findViewById(R.id.sensor_name);
         TextView device_name = (TextView) convertView.findViewById(R.id.device_name);
         TextView status_message = (TextView) convertView.findViewById(R.id.status_message);

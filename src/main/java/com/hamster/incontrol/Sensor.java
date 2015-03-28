@@ -203,9 +203,8 @@ class Sensor {
         this.mParentControlCenter = mParentControlCenter;
     }
 
-
-    public String getTriggerString() {
-        return mTrigger.toString();
+    public Trigger getTriggerInstance() {
+        return mTrigger;
     }
 
     public void setTriggerString(String mTriggers) {
@@ -220,24 +219,30 @@ class Sensor {
         if (mTriggerString != null && !mTriggerString.equals("")) {
             mTrigger = new Trigger(mContext, mTriggerString, this);
             if (this.isInfoComplete() && upload) {
-                this.saveToDatabase();
-                BackgroundTaskDesc task =
-                        new BackgroundTaskDesc(Operation.OPERATION_UPLOAD_SENSOR_TRIGGER,
-                                this,
-                                null,
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(mContext, // TODO STRING
-                                                mContext.getResources().getString(R.string.toast_error_renaming_sensor),
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                NetworkBackgroundOperator op = new NetworkBackgroundOperator(task);
-                op.execute();
+                uploadTriggerSetting();
             }
         }
         return true;
+    }
+
+    // If we use Trigger instance to change act/cond, we need this to upload
+    public void uploadTriggerSetting() {
+        this.saveToDatabase();
+        BackgroundTaskDesc task =
+                new BackgroundTaskDesc(Operation.OPERATION_UPLOAD_SENSOR_TRIGGER,
+                        this,
+                        null,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext,
+                                        mContext.getResources().getString
+                                                (R.string.toast_error_upload_trigger),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+        NetworkBackgroundOperator op = new NetworkBackgroundOperator(task);
+        op.execute();
     }
 
     public boolean isInfoComplete() {

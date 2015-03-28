@@ -29,8 +29,8 @@ class NetworkAccessor {
     /**
      * API地址
      */
-    //public static final String INCONTROL_API_URL = "http://incontrol.sinaapp.com/incontrol_api.php";
-    public static final String INCONTROL_API_URL = "http://192.168.43.2/incontrol/incontrol/incontrol_api.php";
+    public static final String INCONTROL_API_URL = "http://incontrol.sinaapp.com/incontrol_api.php";
+    //public static final String INCONTROL_API_URL = "http://192.168.43.2/incontrol/incontrol/incontrol_api.php";
 
     /**
      * 设备类型，这个数值应与PHP保持一致，不能修改
@@ -180,10 +180,14 @@ class NetworkAccessor {
      */
     public static boolean uploadSensorTrigger(Sensor snr) throws IOException {
         Map<String, String> paramMap = new HashMap<>(5);
+
+        String triggerStr = snr.getTriggerInstance().toString().equals("") ?
+                "null" : snr.getTriggerInstance().toString();
         paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(snr.getParentControlCenter().getDeviceId()));
         paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
         paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_TRIGGER));
-        paramMap.put(URL_SENSOR_TRIGGER_KEY, snr.getTriggerString());
+        paramMap.put(URL_SENSOR_TRIGGER_KEY, Base64.encodeToString(
+                triggerStr.getBytes(), Base64.NO_WRAP));
         paramMap.put(URL_SENSOR_ID_KEY, String.valueOf(snr.getSensorId()));
 
         try {
@@ -275,14 +279,15 @@ class NetworkAccessor {
         HttpResponse httpResponse = httpClient.execute(httpGet);
         Log.v(LOG_TAG, "fetchSensorListJSON() got response, returning");
 
+        String entity = EntityUtils.toString(httpResponse.getEntity());
         if (httpResponse.getStatusLine().getStatusCode() == 200) {
             Log.v(LOG_TAG, "getHttpReturnString() status code = 200");
-            return EntityUtils.toString(httpResponse.getEntity());
+            return entity;
         } else if (httpResponse.getStatusLine().getStatusCode() == 501) { // "Not implemented"
             Log.e(LOG_TAG, "getHttpReturnString() status code = 501, msg="
-                    + EntityUtils.toString(httpResponse.getEntity()));
+                    + entity);
             throw new IOException("参数错误，请检查是否存在错误的设备ID！ Detail: "
-                    + EntityUtils.toString(httpResponse.getEntity()));
+                    + entity);
         } else {
             Log.e(LOG_TAG, "getHttpReturnString() status code = (unknown) "
                     + String.valueOf(httpResponse.getStatusLine().getStatusCode()));
