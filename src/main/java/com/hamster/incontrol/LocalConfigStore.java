@@ -327,7 +327,7 @@ class LocalConfigStore {
     public int removeDevice(int device_id) {
         int result = 0;
         result |= db.delete(MYDEVICE_TABLE_NAME, "device_id = ?", new String[]{String.valueOf(device_id)});
-        result |= db.delete(SENSORS_TABLE_NAME, "sensor_parent_control_id = ?", new String[]{String.valueOf(device_id)});
+        result |= db.delete(SENSORS_TABLE_NAME, "control_id = ?", new String[]{String.valueOf(device_id)});
         return result;
     }
 
