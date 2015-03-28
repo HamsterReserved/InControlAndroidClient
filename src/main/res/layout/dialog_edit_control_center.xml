@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:layout_weight="1"
-        android:hint="@string/text_hint_controller_id" />
+        android:hint="@string/text_hint_controller_id"
+        android:inputType="number" />
 
     <EditText
         android:id="@+id/et_control_name"

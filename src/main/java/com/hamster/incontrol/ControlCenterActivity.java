@@ -2,6 +2,7 @@ package com.hamster.incontrol;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -15,16 +16,20 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.hamster.incontrol.NetworkBackgroundOperator.BackgroundTaskDesc;
+import com.hamster.incontrol.NetworkBackgroundOperator.Operation;
 
 public class ControlCenterActivity extends Activity {
 
     private Handler handler = new Handler();
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_center);
 
+        mContext = this;
         ListView lv = (ListView) findViewById(R.id.manage_device_list);
         DeviceDetailViewAdapter lv_adapter = new DeviceDetailViewAdapter(this);
         lv.setAdapter(lv_adapter);
@@ -98,22 +103,78 @@ public class ControlCenterActivity extends Activity {
                 cc.setDeviceName(et_cc_name.getText().toString());
                 cc.setCredentials(et_cc_cred.getText().toString());
 
-                LocalConfigStore lcs = new LocalConfigStore(mContext);
-
-                if (cc.isInfoComplete()) lcs.updateDevice(cc, ControlCenter.INVALID_DEVICE_ID);
-
-                lcs.close();
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadControllers();
-                    }
-                });
+                checkAndAddControlCenter(cc);
             }
         };
 
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, res.getText(R.string.button_ok), ocl_positive);
         alertDialog.show();
     }
+
+
+    private void dismissCheckDialog(ProgressDialog dialog) {
+        dialog.dismiss();
+    }
+
+    private void reallyAddNewControlCenter(ControlCenter cc) {
+        LocalConfigStore lcs = new LocalConfigStore(mContext);
+        if (cc.isInfoComplete()) lcs.updateDevice(cc, ControlCenter.INVALID_DEVICE_ID);
+        lcs.close();
+    }
+
+    private void checkAndAddControlCenter(final ControlCenter cc) {
+        LocalConfigStore lcs = new LocalConfigStore(mContext);
+        ControlCenter[] ccs = lcs.getControlCenters();
+        lcs.close();
+
+        for (ControlCenter temp_cc : ccs) {
+            if (temp_cc.getDeviceId() == cc.getDeviceId()) {
+                // We are just changing name
+                reallyAddNewControlCenter(cc);
+                return;
+            }
+        }
+
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setMessage("Verifying...");
+        dialog.show();
+
+        // We are adding a new one
+        BackgroundTaskDesc task = new BackgroundTaskDesc(Operation.OPERATION_USER_REGISTRATION,
+                new Object[]{cc.getDeviceId(), cc.getDeviceName()},
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissCheckDialog(dialog);
+                        reallyAddNewControlCenter(cc);
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadControllers();
+                            }
+                        });
+                    }
+                },
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissCheckDialog(dialog);
+                        Toast.makeText(mContext, "Not allowed to register this Control Center. Please start pairing process on the machine.", Toast.LENGTH_SHORT).show();
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadControllers();
+                            }
+                        });
+                    }
+                });
+        NetworkBackgroundOperator bg = new NetworkBackgroundOperator(task);
+        bg.execute();
+    }
+
 }

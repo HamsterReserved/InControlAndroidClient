@@ -1,7 +1,6 @@
 package com.hamster.incontrol;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.hamster.incontrol.NetworkBackgroundOperator.BackgroundTaskDesc;
@@ -85,7 +84,7 @@ class ControlCenter {
         if (this.isInfoComplete() && upload) {
             BackgroundTaskDesc task =
                     new BackgroundTaskDesc(Operation.OPERATION_RENAME_DEVICE,
-                            this,
+                            new Object[]{this},
                             null,
                             new Runnable() {
                                 @Override

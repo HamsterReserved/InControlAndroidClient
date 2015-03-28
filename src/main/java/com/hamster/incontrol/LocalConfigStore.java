@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+
 /**
  * 配置中心，也可以读写数据库
  */
@@ -72,7 +73,7 @@ class LocalConfigStore {
         cv.put(DEVICE_ID_KEY, device_id);
 
         if (add_new) {
-            return db.insert(MYDEVICE_TABLE_NAME, null, cv);
+            return db.insert(MYDEVICE_TABLE_NAME, null, cv); // TODO
         } else {
             return db.update(MYDEVICE_TABLE_NAME, cv, DEVICE_ID_KEY + "=" + String.valueOf(org_device_id), null);
         }

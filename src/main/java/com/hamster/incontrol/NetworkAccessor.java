@@ -55,6 +55,10 @@ class NetworkAccessor {
      */
     public static final int REQUEST_TYPE_QUERY_DEVICE_INFO = 4;
     /**
+     * 用户添加传感器时的验证
+     */
+    public static final int REQUEST_TYPE_USER_REGISTRATION = 98;
+    /**
      * 设置类参数的起始值
      */
     public static final int REQUEST_TYPE_SET_BASE = 100;
@@ -126,6 +130,33 @@ class NetworkAccessor {
     }
 
     /**
+     * 添加新控制中心时需要验证
+     *
+     * @param device_id 必须，目标设备ID
+     * @param name 打算给它起的名字
+     * @return true=允许添加 false=不允许添加
+     */
+    public static boolean userRegistration(int device_id, String name) throws IOException {
+        Map<String, String> paramMap = new HashMap<>(5);
+        paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(device_id));
+        paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
+        paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_USER_REGISTRATION));
+        if (!name.equals("")) { // Studio says (null_string).equals("") == true
+            paramMap.put(URL_DEVICE_NAME_KEY, Base64.encodeToString(name.getBytes()
+                    , Base64.NO_WRAP | Base64.URL_SAFE));
+        }
+
+        try {
+            JSONObject json = new JSONObject(getHttpReturnString(paramMap));
+            if (json.getString("result").equals("ok"))
+                return true;
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "userRegistration failed with JSON exp: " + e.getLocalizedMessage());
+        }
+        return false;
+    }
+
+    /**
      * 上传传感器名字更新到服务器
      *
      * @param snr 已经改过名字的Sensor实例
@@ -136,7 +167,8 @@ class NetworkAccessor {
         paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(snr.getParentControlCenter().getDeviceId()));
         paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
         paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_NAME));
-        paramMap.put(URL_SENSOR_NAME_KEY, Base64.encodeToString(snr.getSensorName().getBytes(), Base64.NO_WRAP | Base64.URL_SAFE));
+        paramMap.put(URL_SENSOR_NAME_KEY, Base64.encodeToString(snr.getSensorName().getBytes()
+                , Base64.NO_WRAP | Base64.URL_SAFE));
         paramMap.put(URL_SENSOR_ID_KEY, String.valueOf(snr.getSensorId()));
 
         try {
@@ -160,7 +192,8 @@ class NetworkAccessor {
         paramMap.put(URL_DEVICE_ID_KEY, String.valueOf(cc.getDeviceId()));
         paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
         paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_NAME));
-        paramMap.put(URL_DEVICE_NAME_KEY, Base64.encodeToString(cc.getDeviceName().getBytes(), Base64.URL_SAFE));
+        paramMap.put(URL_DEVICE_NAME_KEY, Base64.encodeToString(cc.getDeviceName().getBytes()
+                , Base64.NO_WRAP | Base64.URL_SAFE));
 
         try {
             JSONObject json = new JSONObject(getHttpReturnString(paramMap));
@@ -187,7 +220,7 @@ class NetworkAccessor {
         paramMap.put(URL_DEVICE_TYPE_KEY, String.valueOf(DEVICE_TYPE));
         paramMap.put(URL_REQUEST_TYPE_KEY, String.valueOf(REQUEST_TYPE_SET_SENSOR_TRIGGER));
         paramMap.put(URL_SENSOR_TRIGGER_KEY, Base64.encodeToString(
-                triggerStr.getBytes(), Base64.NO_WRAP));
+                triggerStr.getBytes(), Base64.URL_SAFE | Base64.NO_WRAP));
         paramMap.put(URL_SENSOR_ID_KEY, String.valueOf(snr.getSensorId()));
 
         try {

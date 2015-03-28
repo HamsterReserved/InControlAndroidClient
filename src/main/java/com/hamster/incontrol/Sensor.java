@@ -179,7 +179,7 @@ class Sensor {
             this.saveToDatabase(); // We are *changing* name, not just initializing
             BackgroundTaskDesc task =
                     new BackgroundTaskDesc(Operation.OPERATION_RENAME_SENSOR,
-                            this,
+                            new Object[]{this},
                             null,
                             new Runnable() {
                                 @Override
@@ -230,7 +230,7 @@ class Sensor {
         this.saveToDatabase();
         BackgroundTaskDesc task =
                 new BackgroundTaskDesc(Operation.OPERATION_UPLOAD_SENSOR_TRIGGER,
-                        this,
+                        new Object[]{this},
                         null,
                         new Runnable() {
                             @Override

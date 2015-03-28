@@ -16,18 +16,19 @@ class NetworkBackgroundOperator {
     public static enum Operation {
         OPERATION_RENAME_SENSOR,
         OPERATION_RENAME_DEVICE,
-        OPERATION_UPLOAD_SENSOR_TRIGGER
+        OPERATION_UPLOAD_SENSOR_TRIGGER,
+        OPERATION_USER_REGISTRATION
     }
 
     public static class BackgroundTaskDesc {
         public Operation mOperation;
-        public Object mParam;
+        public Object[] mParams;
         public Runnable mRunOnSuccess;
         public Runnable mRunOnFail;
 
-        BackgroundTaskDesc(Operation op, Object param, Runnable onSucc, Runnable onFail) {
+        BackgroundTaskDesc(Operation op, Object[] param, Runnable onSucc, Runnable onFail) {
             mOperation = op;
-            mParam = param;
+            mParams = param;
             mRunOnSuccess = onSucc;
             mRunOnFail = onFail;
         }
@@ -49,11 +50,14 @@ class NetworkBackgroundOperator {
             mBGTask = params[0];
             switch (params[0].mOperation) {
                 case OPERATION_RENAME_DEVICE:
-                    return renameDevice((ControlCenter) params[0].mParam);
+                    return renameDevice((ControlCenter) params[0].mParams[0]);
                 case OPERATION_RENAME_SENSOR:
-                    return renameSensor((Sensor) params[0].mParam);
+                    return renameSensor((Sensor) params[0].mParams[0]);
                 case OPERATION_UPLOAD_SENSOR_TRIGGER:
-                    return uploadSensorTrigger((Sensor) params[0].mParam);
+                    return uploadSensorTrigger((Sensor) params[0].mParams[0]);
+                case OPERATION_USER_REGISTRATION:
+                    return userRegistration((Integer) params[0].mParams[0],
+                            (String) params[0].mParams[1]);
             }
             return false;
         }
@@ -96,6 +100,15 @@ class NetworkBackgroundOperator {
                 } catch (IOException e) {
                     Log.e(TAG, "uploadSensorTrigger failed with " + e.getLocalizedMessage());
                 }
+            }
+            return false;
+        }
+
+        private boolean userRegistration(int device_id, String name) {
+            try {
+                return NetworkAccessor.userRegistration(device_id, name);
+            } catch (IOException e) {
+                Log.e(TAG, "userRegistration failed with " + e.getLocalizedMessage());
             }
             return false;
         }
