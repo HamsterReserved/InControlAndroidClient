@@ -127,11 +127,13 @@ public class ControlCenterActivity extends Activity {
         ControlCenter[] ccs = lcs.getControlCenters();
         lcs.close();
 
-        for (ControlCenter temp_cc : ccs) {
-            if (temp_cc.getDeviceId() == cc.getDeviceId()) {
-                // We are just changing name
-                reallyAddNewControlCenter(cc);
-                return;
+        if (ccs != null) {
+            for (ControlCenter temp_cc : ccs) {
+                if (temp_cc.getDeviceId() == cc.getDeviceId()) {
+                    // We are just changing name
+                    reallyAddNewControlCenter(cc);
+                    return;
+                }
             }
         }
 
