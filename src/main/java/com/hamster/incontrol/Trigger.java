@@ -139,17 +139,18 @@ class Trigger {
         private Sensor mOriginatingSensor;
         private Sensor mSensorToCompare; // TODO Abandoned
 
-        Condition(String initString) {
-            LocalConfigStore lcs = new LocalConfigStore(mContext);
+        /**
+         * This is for adding condition directly with a sensor
+         */
+        Condition(String initString, Sensor snr) {
             String[] strs = initString.split(",");
 
-            if (strs.length < 3)
+            if (strs.length < 2)
                 return;
             mCondition = convertIntToConditionType(Integer.parseInt(strs[0]));
             mComparingValue = strs[1];
-            mOriginatingSensor = lcs.getSensorById(Integer.parseInt(strs[2]));
+            mOriginatingSensor = snr;
             // Abandoned mSensorToCompare = lcs.getSensorById(Integer.parseInt(strs[3]));
-            lcs.close();
         }
 
         Condition(ConditionType type, String comparingValue, Sensor originatingSensor) {
@@ -289,7 +290,7 @@ class Trigger {
 
         for (String cond : conds) {
             if (!cond.isEmpty()) {
-                mConditions.add(new Condition(cond));
+                mConditions.add(new Condition(cond, this.mAssociatedSensor));
             }
         }
 
