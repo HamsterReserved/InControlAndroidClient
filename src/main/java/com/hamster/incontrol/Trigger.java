@@ -3,6 +3,7 @@ package com.hamster.incontrol;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.IOException;
@@ -93,14 +94,13 @@ class Trigger {
         public void doAction(String notificationBody) {
             switch (mActionType) {
                 case ACTION_SHOW_NOTIFICATION:
-                    String notifBody = mActionContent;
-                    if (notificationBody != null) {
-                        notifBody = notificationBody;
-                    }
-                    Notification.Builder builder = new Notification.Builder(mContext);
+                    String notifBody = notificationBody == null ? mActionContent : notificationBody;
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
                     builder.setContentTitle(mContext.getResources().getString(R.string.app_name));
                     builder.setContentText(notifBody);
-                    Notification notif = builder.getNotification(); // For compat on Android 4.0
+                    builder.setSmallIcon(R.drawable.ic_launcher);
+                    builder.setAutoCancel(true);
+                    Notification notif = builder.build(); // For compat on Android 4.0
 
                     NotificationManager nm = (NotificationManager)
                             mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -163,25 +163,27 @@ class Trigger {
             return mComparingValue.contains("%");
         }
 
-        public boolean doCheck() {
+        public boolean doCheck(boolean isNeedRefresh) {
             if (isRelative() && mSensorToCompare == null) // Uses relative number but no sensor to compare
                 return false;
-            if (mSensorToCompare != null) {
+            if (isNeedRefresh) {
+                if (mSensorToCompare != null) {
+                    try {
+                        mSensorToCompare.getParentControlCenter().updateSensors();
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error occurred when checking condition/refreshing target sensors: "
+                                + e.getLocalizedMessage());
+                        return false;
+                    }
+                }
+
                 try {
-                    mSensorToCompare.getParentControlCenter().updateSensors();
+                    mOriginatingSensor.getParentControlCenter().updateSensors();
                 } catch (Exception e) {
-                    Log.e(TAG, "Error occurred when checking condition/refreshing target sensors: "
+                    Log.e(TAG, "Error occurred when checking condition/refreshing origin sensors: "
                             + e.getLocalizedMessage());
                     return false;
                 }
-            }
-
-            try {
-                mOriginatingSensor.getParentControlCenter().updateSensors();
-            } catch (Exception e) {
-                Log.e(TAG, "Error occurred when checking condition/refreshing origin sensors: "
-                        + e.getLocalizedMessage());
-                return false;
             }
 
             switch (mCondition) {
@@ -329,12 +331,13 @@ class Trigger {
     }
 
     public void checkAndRun() {
+        if (mConditions.isEmpty() || mActions.isEmpty()) return;
         for (Condition cond : mConditions) {
-            if (!cond.doCheck()) return;
+            if (!cond.doCheck(false)) return;
         }
         for (Action act : mActions) {
-            act.doAction("Sensor " + mAssociatedSensor.getSensorName()
-                    + " has satisified given conditions. Value is "
+            act.doAction(mAssociatedSensor.getSensorName()
+                    + "'s value is "
                     + String.valueOf(mAssociatedSensor.getSensorCachedValue()));
         }
     }

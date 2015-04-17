@@ -147,6 +147,13 @@ public class MainActivity extends Activity {
             mListAdapter.clearAll(true);
             mListAdapter.addToSensors(snrs);
             mListAdapter.reloadDataWithEmptyView(mEmptyView);
+
+            // Do triggers!
+            for (Sensor snr : snrs) {
+                if (snr.getTriggerInstance() != null) {
+                    snr.getTriggerInstance().checkAndRun();
+                }
+            }
         }
 
         // Stop the refreshing indicator
