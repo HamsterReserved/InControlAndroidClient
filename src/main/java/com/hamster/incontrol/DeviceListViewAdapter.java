@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 
 class DeviceListViewAdapter extends BaseAdapter {
 
@@ -138,7 +137,12 @@ class DeviceListViewAdapter extends BaseAdapter {
 
     public void addToSensors(Sensor new_sensors[]) {
         if (new_sensors == null) return;
-        Collections.addAll(mSensors, new_sensors);
+        //Collections.addAll(mSensors, new_sensors);
+        for (Sensor snr : new_sensors) {
+            if (snr != null) {
+                mSensors.add(snr);
+            }
+        }
     }
 
     @Override
