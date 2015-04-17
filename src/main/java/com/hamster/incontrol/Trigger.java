@@ -65,6 +65,9 @@ class Trigger {
         Action(String savedString) {
             String[] strs = savedString.split(",");
 
+            if (strs.length < 3) {
+                return;
+            }
             this.mActionType = convertIntToActionType(Integer.parseInt(strs[0]));
             this.mActionTarget = strs[1].equals("null") ? null : strs[1]; // "null" -> null
             this.mActionContent = strs[2];
@@ -140,6 +143,8 @@ class Trigger {
             LocalConfigStore lcs = new LocalConfigStore(mContext);
             String[] strs = initString.split(",");
 
+            if (strs.length < 3)
+                return;
             mCondition = convertIntToConditionType(Integer.parseInt(strs[0]));
             mComparingValue = strs[1];
             mOriginatingSensor = lcs.getSensorById(Integer.parseInt(strs[2]));
@@ -283,11 +288,15 @@ class Trigger {
         mConditions.ensureCapacity(conds.length);
 
         for (String cond : conds) {
-            mConditions.add(new Condition(cond));
+            if (!cond.isEmpty()) {
+                mConditions.add(new Condition(cond));
+            }
         }
 
         for (String act : acts) {
-            mActions.add(new Action(act));
+            if (!act.isEmpty()) {
+                mActions.add(new Action(act));
+            }
         }
     }
 
