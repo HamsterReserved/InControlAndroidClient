@@ -111,6 +111,7 @@ public class MainActivity extends Activity {
         Log.v(TAG, "refreshSensorList called, isCalledFromSwipe=" + isCalledFromSwipe);
 
         if (!isCalledFromSwipe) mSwipeRefreshLayout.setRefreshing(true);
+        loadCachedSensors();
         new RefreshDataBackgroundTask().execute();
     }
 
@@ -119,6 +120,8 @@ public class MainActivity extends Activity {
         final ControlCenter[] ccs = lcs.getControlCenters(); // This is local only
 
         if (ccs == null) {
+            mListAdapter.clearAll(false);
+            mListAdapter.reloadDataWithEmptyView(mEmptyView);
             lcs.close();
             return;
         }

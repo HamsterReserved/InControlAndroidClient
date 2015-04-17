@@ -150,6 +150,8 @@ class ControlCenter {
         for (int i = 0; i < sensors.length; ++i) {
             if (jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY) == Sensor.INVALID_SENSOR_ID) {
                 // TODO BUG: sensor[i] will be null here
+                // Workaround is added in the same commit (git blame)
+                // but we need a better solution
                 continue;
             }
             sensors[i] = new Sensor(this, this.context);
