@@ -120,7 +120,7 @@ class Trigger {
                     return "Show a notification";
                 case ACTION_SEND_SMS:
                     return "Send a message to " + mActionTarget +
-                            (mActionContent == null ? " saying " + mActionContent : "");
+                            (mActionContent != null ? " saying " + mActionContent : "");
                 case ACTION_TRIGGER_SENSOR:
                     return "Toggle switch (ID) " + mActionTarget;
                 default:
