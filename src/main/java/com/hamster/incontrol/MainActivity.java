@@ -150,7 +150,7 @@ public class MainActivity extends Activity {
 
             // Do triggers!
             for (Sensor snr : snrs) {
-                if (snr.getTriggerInstance() != null) {
+                if (snr != null && snr.getTriggerInstance() != null) {
                     snr.getTriggerInstance().checkAndRun();
                 }
             }

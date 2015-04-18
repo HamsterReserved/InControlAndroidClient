@@ -147,21 +147,22 @@ class ControlCenter {
         this.sensors = null; // To keep that fresh w/o memory leak?
         this.sensors = new Sensor[jsonArray.length() - invalid_sensor_count];
 
-        for (int i = 0; i < sensors.length; ++i) {
-            if (jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY) == Sensor.INVALID_SENSOR_ID) {
-                // TODO BUG: sensor[i] will be null here
-                // Workaround is added in the same commit (git blame)
-                // but we need a better solution
+        int array_i = 0;
+        for (int json_i = 0; json_i < jsonArray.length(); ++json_i, ++array_i) {
+            if (jsonArray.getJSONObject(json_i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY) == Sensor.INVALID_SENSOR_ID) {
+                // loop json_i but not actual_i for sensor array
+                // this is prohibiting null from appearing in sensor array
+                array_i--;
                 continue;
             }
-            sensors[i] = new Sensor(this, this.context);
-            sensors[i].setSensorId(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY));
-            sensors[i].setSensorType(Sensor.convertIntToType(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_TYPE_KEY)));
-            sensors[i].setSensorName(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_NAME_KEY));
-            sensors[i].setSensorCachedValue(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_VALUE_KEY));
-            sensors[i].setLastUpdateDate(jsonArray.getJSONObject(i).getInt(NetworkAccessor.JSON_SENSOR_DATE_KEY));
-            sensors[i].setTriggerString(jsonArray.getJSONObject(i).getString(NetworkAccessor.JSON_SENSOR_TRIGGER_KEY));
-            sensors[i].saveToDatabase();
+            sensors[array_i] = new Sensor(this, this.context);
+            sensors[array_i].setSensorId(jsonArray.getJSONObject(array_i).getInt(NetworkAccessor.JSON_SENSOR_ID_KEY));
+            sensors[array_i].setSensorType(Sensor.convertIntToType(jsonArray.getJSONObject(array_i).getInt(NetworkAccessor.JSON_SENSOR_TYPE_KEY)));
+            sensors[array_i].setSensorName(jsonArray.getJSONObject(array_i).getString(NetworkAccessor.JSON_SENSOR_NAME_KEY));
+            sensors[array_i].setSensorCachedValue(jsonArray.getJSONObject(array_i).getString(NetworkAccessor.JSON_SENSOR_VALUE_KEY));
+            sensors[array_i].setLastUpdateDate(jsonArray.getJSONObject(array_i).getInt(NetworkAccessor.JSON_SENSOR_DATE_KEY));
+            sensors[array_i].setTriggerString(jsonArray.getJSONObject(array_i).getString(NetworkAccessor.JSON_SENSOR_TRIGGER_KEY));
+            sensors[array_i].saveToDatabase();
         }
     }
 }
